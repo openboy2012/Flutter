@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'dart:io';
+import 'dart:convert';
 import 'package:path_provider/path_provider.dart';
 
 class SecondPage extends StatefulWidget {
@@ -23,7 +24,7 @@ class SecondPage extends StatefulWidget {
   _SecondPage createState() => _SecondPage();
 }
 
-class Api {
+class BL2CookieApi {
   //改为使用 PersistCookieJar，在文档中有介绍，PersistCookieJar将cookie保留在文件中，因此，如果应用程序退出，则cookie始终存在，除非显式调用delete
   static PersistCookieJar _cookieJar;
   static Future<PersistCookieJar> get cookieJar async {
@@ -36,11 +37,6 @@ class Api {
     }
     return _cookieJar;
   }
-}
-
-class BHostApi
-{
-
 }
 
 class _SecondPage extends State<SecondPage> {
@@ -58,6 +54,41 @@ class _SecondPage extends State<SecondPage> {
       _counter++;
 
     });
+  }
+
+
+  void _blLoginAction() async
+  {
+    Map<String, dynamic> headers = new Map();
+    headers["token"] = "m5PI6y/SsFsmH5fCslcS+kU/OTH9BOASTHKr7dIT9OnTr0jtf8kSDVbJOX1JiFywdxlifmw+i7hFhx5DFj1dYxvrPriAphvI/WTvbkUshk2gbbKe5T4AIrKT5AkFbnVm";
+    BaseOptions options = new BaseOptions(
+        headers:headers
+    );
+    Dio dio = new Dio(options);
+    Map<String, dynamic> params = new Map();
+    params["account"] = '1011550377';
+    params["loginType"] = 0;
+    params["passWord"] = 'asdf1234';
+    ///登陆账号
+    Response response = await dio.post("https://h5.mobage.cn/bl2/cn_bl2_doll_machine/api/active/player/login", data: params);
+    print("Account Login is" + response.data.toString());
+
+    ///获取绑定列表
+    Response responseServer = await dio.get("https://h5.mobage.cn/bl2/cn_bl2_doll_machine/api/active/player/getServerList");
+    print("ServerList is" + responseServer.data.toString());
+    var serverList = jsonDecode(responseServer.toString());
+
+
+    ///获取积分
+    for (int i = 0; i < 5; i++)
+    {
+      Response responsePoint = await dio.post("https://h5.mobage.cn/bl2/cn_bl2_doll_machine/api/active/playerItem/getPoint", data: {"type":i});
+      print("getPoint type is " + i.toString() + " Reuslt is" + responsePoint.data.toString());
+    }
+
+    ///获取已经获得的娃娃信息
+    Response responseGetPoint = await dio.get("https://h5.mobage.cn/bl2/cn_bl2_doll_machine/api/active/playerItem/getItemInfo");
+    print("Point Info is" + responseGetPoint.data.toString());
   }
 
   FlatButton normalFlatButton(){
@@ -88,14 +119,7 @@ class _SecondPage extends State<SecondPage> {
         FlatButton(
           color: Colors.grey,
           textColor: Colors.white,
-          onPressed: () async {
-            Response response;
-            String cookies = '';
-            Dio dio = new Dio();
-            response = await dio.post("https://h5.mobage.cn/bl2/cn_bl2_doll_machine/api/active/player/login");
-            responseText = response.data.toString();
-            print(responseText);
-          },
+          onPressed: _blLoginAction,
           child: Container(
             height: 100,
             width: 100,
