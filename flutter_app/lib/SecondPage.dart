@@ -66,9 +66,15 @@ class _SecondPage extends State<SecondPage> {
     );
     Dio dio = new Dio(options);
     Map<String, dynamic> params = new Map();
-    params["account"] = '1011550377';
     params["loginType"] = 0;
+    params["account"] = '1011550377';
     params["passWord"] = 'asdf1234';
+    // params["account"] = '18657349251';
+    // params["passWord"] = 'dkl1234';
+    // params["account"] = '18043172036';
+    // params["passWord"] = 'renwei1234';
+    // params["account"] = '1010473892';
+    // params["passWord"] = 'liuyixian11';
     ///登陆账号
     Response response = await dio.post("https://h5.mobage.cn/bl2/cn_bl2_doll_machine/api/active/player/login", data: params);
     print("Account Login is" + response.data.toString());
@@ -77,7 +83,6 @@ class _SecondPage extends State<SecondPage> {
     Response responseServer = await dio.get("https://h5.mobage.cn/bl2/cn_bl2_doll_machine/api/active/player/getServerList");
     print("ServerList is" + responseServer.data.toString());
     var serverList = jsonDecode(responseServer.toString());
-
 
     ///获取积分
     for (int i = 0; i < 5; i++)
@@ -161,7 +166,7 @@ class _SecondPage extends State<SecondPage> {
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: Text("第二页"),
+        title: Text("死神激斗领取积分"),
       ),
       body: _listView(),
     );

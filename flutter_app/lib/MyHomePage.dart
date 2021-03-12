@@ -51,18 +51,23 @@ class _MyHomePageState extends State<MyHomePage> {
     // print(response.data.toString());
   }
 
-  FlatButton normalFlatButton(){
+  FlatButton getPointFlatButton(){
     return FlatButton(
       onPressed: (){
-        print("点击了 button");
+        Navigator.push(context, MaterialPageRoute(builder: (context) => SecondPage()));
       },
-      onLongPress: (){
-        print("长按了 button");
+      child: Text("死神激斗积分领取"),
+      color: Colors.blue,
+      textColor: Colors.white,
+    );
+  }
+
+  FlatButton palyerFlatButton(){
+    return FlatButton(
+      onPressed: (){
+        // Navigator.push(context, MaterialPageRoute(builder: (context) => SecondPage()));
       },
-      onHighlightChanged: (bool b){
-        print(b ? "button 高亮了" : "button 不亮了");
-      },
-      child: Text("我是一个按钮"),
+      child: Text("死神激斗刷分"),
       color: Colors.blue,
       textColor: Colors.white,
     );
@@ -80,7 +85,7 @@ class _MyHomePageState extends State<MyHomePage> {
           color: Colors.grey,
           textColor: Colors.white,
           onPressed: (){
-            Navigator.push(context, MaterialPageRoute(builder: (context) => SecondPage()));
+
           },
           child: Container(
             height: 100,
@@ -105,43 +110,15 @@ class _MyHomePageState extends State<MyHomePage> {
     return ListView(
       padding: EdgeInsets.all(20),
       children: [
-        normalFlatButton(),
-        _shapeColumn(),
-        Center(
-          // Center is a layout widget. It takes a single child and positions it
-          // in the middle of the parent.
-          child: Column(
-            // Column is also a layout widget. It takes a list of children and
-            // arranges them vertically. By default, it sizes itself to fit its
-            // children horizontally, and tries to be as tall as its parent.
-            //
-            // Invoke "debug painting" (press "p" in the console, choose the
-            // "Toggle Debug Paint" action from the Flutter Inspector in Android
-            // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-            // to see the wireframe for each widget.
-            //
-            // Column has various properties to control how it sizes itself and
-            // how it positions its children. Here we use mainAxisAlignment to
-            // center the children vertically; the main axis here is the vertical
-            // axis because Columns are vertical (the cross axis would be
-            // horizontal).
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Text(
-                'You have pushed the button this many times:',
-              ),
-              Text(
-                '$_counter',
-                style: Theme
-                    .of(context)
-                    .textTheme
-                    .headline4,
-              ),
-              Text('Request https://baidu.com'),
-
-            ],
+        getPointFlatButton(),
+        Padding(
+          padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+          child: Container(
+            height: 40,
           ),
         ),
+        palyerFlatButton(),
+        // _shapeColumn(),
       ],
     );
   }
@@ -158,15 +135,9 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        title: Text("死神激斗"),
       ),
       body: _listView(),
-
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
