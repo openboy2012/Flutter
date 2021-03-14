@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:cookie_jar/cookie_jar.dart';
+import 'package:flutter_app/APIs/BLApi.dart';
+import 'package:flutter_app/Models/BLServerInfo.dart';
 import 'dart:io';
 import 'dart:convert';
 import 'package:path_provider/path_provider.dart';
@@ -60,9 +62,10 @@ class _SecondPage extends State<SecondPage> {
   void _blLoginAction() async
   {
     Map<String, dynamic> headers = new Map();
-    headers["token"] = "m5PI6y/SsFsmH5fCslcS+kU/OTH9BOASTHKr7dIT9OnTr0jtf8kSDVbJOX1JiFywdxlifmw+i7hFhx5DFj1dYxvrPriAphvI/WTvbkUshk2gbbKe5T4AIrKT5AkFbnVm";
+    headers["token"] = BLApi.BL_WX_TOKEN;
     BaseOptions options = new BaseOptions(
-        headers:headers
+      headers:headers,
+      baseUrl:BLApi.BL_BASE_URL,
     );
     Dio dio = new Dio(options);
     Map<String, dynamic> params = new Map();
@@ -76,23 +79,23 @@ class _SecondPage extends State<SecondPage> {
     // params["account"] = '1010473892';
     // params["passWord"] = 'liuyixian11';
     ///登陆账号
-    Response response = await dio.post("https://h5.mobage.cn/bl2/cn_bl2_doll_machine/api/active/player/login", data: params);
+    Response response = await dio.post(BLApi.BL_USER_LOGIN, data: params);
     print("Account Login is" + response.data.toString());
 
     ///获取绑定列表
-    Response responseServer = await dio.get("https://h5.mobage.cn/bl2/cn_bl2_doll_machine/api/active/player/getServerList");
+    Response responseServer = await dio.get(BLApi.BL_SERVER_LIST);
     print("ServerList is" + responseServer.data.toString());
-    var serverList = jsonDecode(responseServer.toString());
+    var serverList = BlServerInfoResp.fromJson(responseServer.data);
 
     ///获取积分
     for (int i = 0; i < 5; i++)
     {
-      Response responsePoint = await dio.post("https://h5.mobage.cn/bl2/cn_bl2_doll_machine/api/active/playerItem/getPoint", data: {"type":i});
+      Response responsePoint = await dio.post(BLApi.BL_GET_POINT, data: {"type":i});
       print("getPoint type is " + i.toString() + " Reuslt is" + responsePoint.data.toString());
     }
 
     ///获取已经获得的娃娃信息
-    Response responseGetPoint = await dio.get("https://h5.mobage.cn/bl2/cn_bl2_doll_machine/api/active/playerItem/getItemInfo");
+    Response responseGetPoint = await dio.get(BLApi.BL_USER_DOLL_INFO);
     print("Point Info is" + responseGetPoint.data.toString());
   }
 

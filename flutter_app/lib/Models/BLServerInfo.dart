@@ -4,54 +4,82 @@
 
 import 'dart:convert';
 
-BlServerInfo blServerInfoFromJson(String str) => BlServerInfo.fromJson(json.decode(str));
+BlServerInfoResp blServerInfoFromJson(String str) => BlServerInfoResp.fromJson(json.decode(str));
 
-String blServerInfoToJson(BlServerInfo data) => json.encode(data.toJson());
+String blServerInfoToJson(BlServerInfoResp data) => json.encode(data.toJson());
 
-class BlServerInfo {
-  BlServerInfo({
+class BlServerInfoResp {
+  BlServerInfoResp({
     this.msg,
     this.code,
-    this.serverList,
+    this.platformList,
   });
 
   String msg;
   int code;
-  List<ServerList> serverList;
+  List<BLPlatformInfo> platformList;
 
-  factory BlServerInfo.fromJson(Map<String, dynamic> json) => BlServerInfo(
+  factory BlServerInfoResp.fromJson(Map<String, dynamic> json) => BlServerInfoResp(
     msg: json["msg"],
     code: json["code"],
-    serverList: List<ServerList>.from(json["serverList"].map((x) => ServerList.fromJson(x))),
+    platformList: List<BLPlatformInfo>.from(json["serverList"].map((x) => BLPlatformInfo.fromJson(x))),
   );
 
   Map<String, dynamic> toJson() => {
     "msg": msg,
     "code": code,
-    "serverList": List<dynamic>.from(serverList.map((x) => x.toJson())),
+    "platformList": List<dynamic>.from(platformList.map((x) => x.toJson())),
   };
 }
 
-class ServerList {
-  ServerList({
+class BLPlatformInfo
+{
+  BLPlatformInfo({
     this.name,
-    this.id,
-    this.value,
+    this.platformId,
+    this.serveList,
   });
 
   String name;
-  String id;
-  List<ServerList> value;
+  String platformId;
+  List<BLServerInfo> serveList;
 
-  factory ServerList.fromJson(Map<String, dynamic> json) => ServerList(
+  factory BLPlatformInfo.fromJson(Map<String, dynamic> json) => BLPlatformInfo(
     name: json["name"],
-    id: json["id"],
-    value: json["value"] == null ? null : List<ServerList>.from(json["value"].map((x) => ServerList.fromJson(x))),
+    platformId: json["id"],
+    serveList:List<BLServerInfo>.from(json["value"].map((x) => BLServerInfo.fromJson(x)))
   );
 
   Map<String, dynamic> toJson() => {
     "name": name,
-    "id": id,
-    "value": value == null ? null : List<dynamic>.from(value.map((x) => x.toJson())),
+    "id": this.platformId,
+    // "value": value == null ? null : List<dynamic>.from(value.map((x) => x.toJson())),
+  };
+}
+
+class BLServerInfo {
+  BLServerInfo({
+    this.name,
+    this.serverId,
+    this.nickname,
+    this.roleId,
+  });
+
+  String name;
+  String serverId;
+  String nickname;
+  String roleId;
+
+  factory BLServerInfo.fromJson(Map<String, dynamic> json) => BLServerInfo(
+    name: json["name"],
+    serverId: json["id"],
+    nickname: json["value"]["name"].toString(),
+    roleId: json["value"]["id"].toString(),
+  );
+
+  Map<String, dynamic> toJson() => {
+    "name": name,
+    "id": this.serverId,
+    // "value": value == null ? null : List<dynamic>.from(value.map((x) => x.toJson())),
   };
 }
