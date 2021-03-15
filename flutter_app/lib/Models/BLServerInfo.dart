@@ -28,7 +28,6 @@ class BlServerInfoResp {
   Map<String, dynamic> toJson() => {
     "msg": msg,
     "code": code,
-    "platformList": List<dynamic>.from(platformList.map((x) => x.toJson())),
   };
 }
 
@@ -59,10 +58,10 @@ class BLPlatformInfo
 
 class BLServerInfo {
   BLServerInfo({
-    this.name,
-    this.serverId,
-    this.nickname,
-    this.roleId,
+    this.name, ///服务器名称
+    this.serverId, ///服务器id
+    this.nickname, ///游戏昵称
+    this.roleId, ///角色id
   });
 
   String name;
@@ -73,8 +72,8 @@ class BLServerInfo {
   factory BLServerInfo.fromJson(Map<String, dynamic> json) => BLServerInfo(
     name: json["name"],
     serverId: json["id"],
-    nickname: json["value"]["name"].toString(),
-    roleId: json["value"]["id"].toString(),
+    nickname: json["value"][0]["name"],
+    roleId: json["value"][0]["id"],
   );
 
   Map<String, dynamic> toJson() => {

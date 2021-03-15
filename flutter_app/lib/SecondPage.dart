@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:flutter_app/APIs/BLApi.dart';
+import 'package:flutter_app/Models/BLResponse.dart';
 import 'package:flutter_app/Models/BLServerInfo.dart';
 import 'dart:io';
 import 'dart:convert';
@@ -87,30 +88,47 @@ class _SecondPage extends State<SecondPage> {
     print("ServerList is" + responseServer.data.toString());
     var serverList = BlServerInfoResp.fromJson(responseServer.data);
 
-    ///获取积分
+    var platformInfos = serverList.platformList;
+    for (BLPlatformInfo platformInfo in platformInfos)
+    {
+      ///遍历平台信息
+      if(platformInfo.name == "IOS")
+      {
+        for (BLServerInfo serverInfo in platformInfo.serveList)
+        {
+          Map<String, dynamic> params = new Map();
+          params["phone"] = "18888888888";
+          params["serverId"] = serverInfo.serverId;
+          ///绑定账号内容
+          Response responseBind = await dio.post(BLApi.BL_USER_BIND_ROLE, data:params);
+
+          print("BL user bind role is " + serverInfo.nickname + " is " + BLResponse.fromJson(responseBind.data).code.toString());
+          ///开始获取积分
+          await getAllPoint(dio, serverInfo.nickname);
+        }
+      }
+    }
+  }
+
+  ///获取积分
+  void getAllPoint (Dio dio, String nickname) async
+  {
+    ///按照类型开始领取积分
     for (int i = 0; i < 5; i++)
     {
       Response responsePoint = await dio.post(BLApi.BL_GET_POINT, data: {"type":i});
-      print("getPoint type is " + i.toString() + " Reuslt is" + responsePoint.data.toString());
+      print(nickname + " getPoint type is " + i.toString() + " Reuslt is " + BLResponse.fromJson(responsePoint.data).code.toString());
     }
 
     ///获取已经获得的娃娃信息
-    Response responseGetPoint = await dio.get(BLApi.BL_USER_DOLL_INFO);
-    print("Point Info is" + responseGetPoint.data.toString());
+    // Response responseGetPoint = await dio.get(BLApi.BL_USER_DOLL_INFO);
+    // print("Point Info is" + responseGetPoint.data.toString());
   }
 
   FlatButton normalFlatButton(){
     return FlatButton(
-      onPressed: (){
-        print("点击了 button");
-      },
-      onLongPress: (){
-        print("长按了 button");
-      },
-      onHighlightChanged: (bool b){
-        print(b ? "button 高亮了" : "button 不亮了");
-      },
-      child: Text("我是一个按钮"),
+      onPressed: _blLoginAction,
+      child: Text("自动领取积分"),
       color: Colors.blue,
       textColor: Colors.white,
     );
@@ -152,7 +170,6 @@ class _SecondPage extends State<SecondPage> {
       padding: EdgeInsets.all(20),
       children: [
         normalFlatButton(),
-        _shapeColumn(),
       ],
     );
   }
