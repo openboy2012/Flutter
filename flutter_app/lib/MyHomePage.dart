@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'SecondPage.dart';
+import 'BLGetDollPage.dart';
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
@@ -65,7 +66,7 @@ class _MyHomePageState extends State<MyHomePage> {
   FlatButton palyerFlatButton(){
     return FlatButton(
       onPressed: (){
-        // Navigator.push(context, MaterialPageRoute(builder: (context) => SecondPage()));
+        Navigator.push(context, MaterialPageRoute(builder: (context) => BLGetDollPage()));
       },
       child: Text("死神激斗刷分"),
       color: Colors.blue,

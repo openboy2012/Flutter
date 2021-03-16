@@ -69,55 +69,92 @@ class _SecondPage extends State<SecondPage> {
       baseUrl:BLApi.BL_BASE_URL,
     );
     Dio dio = new Dio(options);
+
+    List<Map<String, dynamic>> accounts = new List();
     Map<String, dynamic> params = new Map();
     params["loginType"] = 0;
     params["account"] = '1011550377';
     params["passWord"] = 'asdf1234';
-    // params["account"] = '18657349251';
-    // params["passWord"] = 'dkl1234';
-    // params["account"] = '18043172036';
-    // params["passWord"] = 'renwei1234';
-    // params["account"] = '1010473892';
-    // params["passWord"] = 'liuyixian11';
-    ///登陆账号
-    Response response = await dio.post(BLApi.BL_USER_LOGIN, data: params);
-    print("Account Login is" + response.data.toString());
+    accounts.add(params);
+    params = new Map();
+    params["loginType"] = 0;
+    params["account"] = '18657349251';
+    params["passWord"] = 'dkl1234';
+    accounts.add(params);
+    params = new Map();
+    params["loginType"] = 0;
+    params["account"] = '18043172036';
+    params["passWord"] = 'renwei1234';
+    accounts.add(params);
+    params = new Map();
+    params["loginType"] = 0;
+    params["account"] = '1010473892';
+    params["passWord"] = 'liuyixian11';
+    accounts.add(params);
+    for (Map<String, dynamic> params in accounts) {
+      ///登陆账号
+      Response responseLogin = await dio.post(BLApi.BL_USER_LOGIN, data: params);
+      int code = BLResponse.fromJson(responseLogin.data).code;
+      print("Account Login is " + code.toString());
+      ///登陆成功
+      if (code == 0) {
+        await doUserGetPoint(dio, params["account"]);
+      }
 
+      Response responseLogout = await dio.post(BLApi.BL_USER_LOGOUT);
+      code = BLResponse.fromJson(responseLogin.data).code;
+      print("Account Logout is " + code.toString());
+    }
+  }
+
+
+  void doUserGetPoint (Dio dio, String accout) async
+  {
     ///获取绑定列表
     Response responseServer = await dio.get(BLApi.BL_SERVER_LIST);
     print("ServerList is" + responseServer.data.toString());
     var serverList = BlServerInfoResp.fromJson(responseServer.data);
 
     var platformInfos = serverList.platformList;
-    for (BLPlatformInfo platformInfo in platformInfos)
-    {
+    for (BLPlatformInfo platformInfo in platformInfos) {
       ///遍历平台信息
-      if(platformInfo.name == "IOS")
-      {
-        for (BLServerInfo serverInfo in platformInfo.serveList)
-        {
+      if (platformInfo.name == "IOS") {
+        for (BLServerInfo serverInfo in platformInfo.serveList) {
           Map<String, dynamic> params = new Map();
           params["phone"] = "18888888888";
           params["serverId"] = serverInfo.serverId;
-          ///绑定账号内容
-          Response responseBind = await dio.post(BLApi.BL_USER_BIND_ROLE, data:params);
 
-          print("BL user bind role is " + serverInfo.nickname + " is " + BLResponse.fromJson(responseBind.data).code.toString());
+          ///绑定账号内容
+          Response responseBind = await dio.post(
+              BLApi.BL_USER_BIND_ROLE, data: params);
+
+          print("BL user bind role is " + serverInfo.nickname + " is " +
+              BLResponse
+                  .fromJson(responseBind.data)
+                  .code
+                  .toString());
+
           ///开始获取积分
-          await getAllPoint(dio, serverInfo.nickname);
+          await getAllPointByUser(dio, serverInfo.nickname);
         }
       }
     }
   }
 
   ///获取积分
-  void getAllPoint (Dio dio, String nickname) async
+  void getAllPointByUser (Dio dio, String nickname) async
   {
     ///按照类型开始领取积分
     for (int i = 0; i < 5; i++)
     {
       Response responsePoint = await dio.post(BLApi.BL_GET_POINT, data: {"type":i});
-      print(nickname + " getPoint type is " + i.toString() + " Reuslt is " + BLResponse.fromJson(responsePoint.data).code.toString());
+      BLResponse response = BLResponse.fromJson(responsePoint.data);
+      print(nickname + " getPoint type is " + i.toString() + " Reuslt is " + response.code.toString());
+      ///没登陆过游戏的，跳出循环
+      if (response.code != 0 && i == 0)
+      {
+        break;
+      }
     }
 
     ///获取已经获得的娃娃信息
