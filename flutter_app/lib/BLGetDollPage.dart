@@ -1,5 +1,3 @@
-import 'dart:html';
-
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_app/APIs/BLApi.dart';
@@ -76,15 +74,29 @@ class _BLGetDollPage extends State<BLGetDollPage> {
       if (blItemInfoResp.code == 0) { ///请求成功
           ///蓝染
           if (dollType == 3) {
-
+            ///没有刷到娃娃，但是成功，需要退出循环
+            if (blItemInfoResp.itemInfo.dolllr != info.dolllr + 1)
+            {
+              needContiue = false;
+            }
+            else {
+              info = blItemInfoResp.itemInfo;
+            }
           }
           ///白哉
           else {
-
+            ///没有刷到娃娃，但是成功，需要退出循环
+            if (blItemInfoResp.itemInfo.dollbz != info.dollbz + 1)
+            {
+              needContiue = false;
+            }
+            else {
+              info = blItemInfoResp.itemInfo;
+            }
           }
       }
       else {
-
+        print("继续刷分");
       }
     }
     while (info.point > 0 && needContiue);
@@ -94,7 +106,7 @@ class _BLGetDollPage extends State<BLGetDollPage> {
   FlatButton loginFlatButton(){
     return FlatButton(
       onPressed: blLoginAction,
-      child: Text("开始刷新娃娃"),
+      child: Text("登陆账号"),
       color: Colors.blue,
       textColor: Colors.white,
     );
@@ -117,7 +129,7 @@ class _BLGetDollPage extends State<BLGetDollPage> {
         TextField(),
         TextField(),
         loginFlatButton(),
-        Text(crystalNumber),
+        // Text(crystalNumber),
         TextField(),
         getDollFlatButton(),
       ],

@@ -57,7 +57,7 @@ class _SecondPage extends State<SecondPage> {
     params["loginType"] = 0;
     params["account"] = '1011550377';
     params["passWord"] = 'asdf1234';
-    accounts.add(params);
+    // accounts.add(params);
     params = new Map();
     params["loginType"] = 0;
     params["account"] = '18657349251';
@@ -132,10 +132,10 @@ class _SecondPage extends State<SecondPage> {
       BLResponse response = BLResponse.fromJson(responsePoint.data);
       print(nickname + " getPoint type is " + i.toString() + " Reuslt is " + response.code.toString());
       ///没登陆过游戏的，跳出循环
-      if (response.code != 0 && i == 0)
-      {
-        break;
-      }
+      // if (response.code != 0 && i == 0)
+      // {
+      //   break;
+      // }
     }
 
     ///获取已经获得的娃娃信息
