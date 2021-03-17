@@ -1,10 +1,10 @@
 // To parse this JSON data, do
 //
-//     final blResponse = blReponseoFromJson(jsonString);
+//     final blResponse = blResponseFromJson(jsonString);
 
 import 'dart:convert';
 
-blReponseoFromJson(String str) => BLResponse.fromJson(json.decode(str));
+blResponseFromJson(String str) => BLResponse.fromJson(json.decode(str));
 
 String blResponseToJson(BLResponse data) => json.encode(data.toJson());
 

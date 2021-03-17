@@ -13,6 +13,8 @@ class BLApi {
   static const String BL_SERVER_LIST = "/player/getServerList";
   ///获取游戏角色的积分内容
   static const String BL_GET_POINT = "/playerItem/getPoint";
+  ///刷娃娃
+  static const String BL_GET_DOLL = "playerItem/getGashapon";
   ///获取娃娃数据
   static const String BL_USER_DOLL_INFO = "/playerItem/getItemInfo";
 }

@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
-import 'package:dio_cookie_manager/dio_cookie_manager.dart';
-import 'package:cookie_jar/cookie_jar.dart';
 import 'SecondPage.dart';
 import 'BLGetDollPage.dart';
 
@@ -24,33 +21,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  String responseText;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-
-      ysDioTest();
-    });
-  }
-
-  void ysDioTest() async {
-    Response response;
-    Dio dio = new Dio();
-    response = await dio.get("http://www.baidu.com");
-    responseText = response.data.toString();
-    print(response.data.toString());
-    // Optionally the request above could also be done as
-    // response = await dio.get("http://www.google.com.cn", queryParameters: {"id": 12, "name": "wendu"});
-    // print(response.data.toString());
-  }
 
   FlatButton getPointFlatButton(){
     return FlatButton(
@@ -63,7 +33,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  FlatButton palyerFlatButton(){
+  FlatButton playerFlatButton(){
     return FlatButton(
       onPressed: (){
         Navigator.push(context, MaterialPageRoute(builder: (context) => BLGetDollPage()));
@@ -71,39 +41,6 @@ class _MyHomePageState extends State<MyHomePage> {
       child: Text("死神激斗刷分"),
       color: Colors.blue,
       textColor: Colors.white,
-    );
-  }
-
-  Column _shapeColumn(){
-    return Column(
-      children: [
-        Container(
-          height: 30,
-          alignment: Alignment.center,
-          child: Text('shape button'),
-        ),
-        FlatButton(
-          color: Colors.grey,
-          textColor: Colors.white,
-          onPressed: (){
-
-          },
-          child: Container(
-            height: 100,
-            width: 100,
-            child: Text('圆的'),
-            alignment: Alignment.center,
-          ),
-          shape: CircleBorder(
-            side: BorderSide(
-              width: 2,
-              color: Colors.red,
-              style: BorderStyle.solid,
-              // style: BorderStyle.none,
-            ),
-          ),
-        ),
-      ],
     );
   }
 
@@ -118,8 +55,7 @@ class _MyHomePageState extends State<MyHomePage> {
             height: 40,
           ),
         ),
-        palyerFlatButton(),
-        // _shapeColumn(),
+        playerFlatButton(),
       ],
     );
   }

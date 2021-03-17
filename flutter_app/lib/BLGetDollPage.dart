@@ -1,10 +1,11 @@
+import 'dart:html';
+
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
-import 'package:cookie_jar/cookie_jar.dart';
 import 'package:flutter_app/APIs/BLApi.dart';
+import 'package:flutter_app/Models/BLItemInfo.dart';
 import 'package:flutter_app/Models/BLResponse.dart';
 import 'package:flutter_app/Models/BLServerInfo.dart';
-import 'package:path_provider/path_provider.dart';
 
 class BLGetDollPage extends StatefulWidget {
   BLGetDollPage({Key key, this.title}) : super(key: key);
@@ -27,7 +28,10 @@ class BLGetDollPage extends StatefulWidget {
 
 class _BLGetDollPage extends State<BLGetDollPage> {
 
-  void _blLoginAction() async
+  String crystalNumber;
+  Dio dio;
+
+  void blLoginAction() async
   {
     Map<String, dynamic> headers = new Map();
     headers["token"] = BLApi.BL_WX_TOKEN;
@@ -35,9 +39,8 @@ class _BLGetDollPage extends State<BLGetDollPage> {
       headers:headers,
       baseUrl:BLApi.BL_BASE_URL,
     );
-    Dio dio = new Dio(options);
+    this.dio = new Dio(options);
 
-    List<Map<String, dynamic>> accounts = new List();
     Map<String, dynamic> params = new Map();
     params["loginType"] = 0;
     params["account"] = '1011550377';
@@ -48,7 +51,7 @@ class _BLGetDollPage extends State<BLGetDollPage> {
     print("Account Login is " + code.toString());
     ///登陆成功
     if (code == 0) {
-      await doUserGetDoll(dio, params["account"]);
+      // doUserGetDoll(this.dio, params["account"]);
     }
 
     // Response responseLogout = await dio.post(BLApi.BL_USER_LOGOUT);
@@ -56,98 +59,53 @@ class _BLGetDollPage extends State<BLGetDollPage> {
     // print("Account Logout is " + code.toString());
   }
 
-
-  void doUserGetDoll (Dio dio, String accout) async
+  void getDollAction () async
   {
     ///获取绑定列表
-    Response responseServer = await dio.get(BLApi.BL_SERVER_LIST);
-    print("ServerList is" + responseServer.data.toString());
-    var serverList = BlServerInfoResp.fromJson(responseServer.data);
+    Response responseItemInfo = await this.dio.get(BLApi.BL_USER_DOLL_INFO);
+    print("BL ItemInfo is " + responseItemInfo.data.toString());
+    var blItemInfoResp = BLItemInfoResp.fromGetItemJson(responseItemInfo.data);
+    print("BL ItemInfo is " + blItemInfoResp.toString());
 
-    var platformInfos = serverList.platformList;
-    for (BLPlatformInfo platformInfo in platformInfos) {
-      ///遍历平台信息
-      if (platformInfo.name == "IOS") {
-        for (BLServerInfo serverInfo in platformInfo.serveList) {
-          Map<String, dynamic> params = new Map();
-          params["phone"] = "18888888888";
-          params["serverId"] = serverInfo.serverId;
+    BLItemInfo info = blItemInfoResp.itemInfo;
+    bool needContiue = true;
+    int dollType = 2;
+    do {
+      Response responseGeDoll = await dio.post(BLApi.BL_GET_DOLL, data:{"type":dollType});
+      blItemInfoResp = BLItemInfoResp.fromGetDollJson(responseGeDoll.data);
+      if (blItemInfoResp.code == 0) { ///请求成功
+          ///蓝染
+          if (dollType == 3) {
 
-          ///绑定账号内容
-          Response responseBind = await dio.post(
-              BLApi.BL_USER_BIND_ROLE, data: params);
+          }
+          ///白哉
+          else {
 
-          print("BL user bind role is " + serverInfo.nickname + " is " +
-              BLResponse
-                  .fromJson(responseBind.data)
-                  .code
-                  .toString());
+          }
+      }
+      else {
 
-          ///开始获取积分
-          await getAllPointByUser(dio, serverInfo.nickname);
-        }
       }
     }
+    while (info.point > 0 && needContiue);
   }
 
-  ///获取积分
-  void getAllPointByUser (Dio dio, String nickname) async
-  {
-    ///按照类型开始领取积分
-    for (int i = 0; i < 5; i++)
-    {
-      Response responsePoint = await dio.post(BLApi.BL_GET_POINT, data: {"type":i});
-      BLResponse response = BLResponse.fromJson(responsePoint.data);
-      print(nickname + " getPoint type is " + i.toString() + " Reuslt is " + response.code.toString());
-      ///没登陆过游戏的，跳出循环
-      if (response.code != 0 && i == 0)
-      {
-        break;
-      }
-    }
 
-    ///获取已经获得的娃娃信息
-    // Response responseGetPoint = await dio.get(BLApi.BL_USER_DOLL_INFO);
-    // print("Point Info is" + responseGetPoint.data.toString());
-  }
-
-  FlatButton normalFlatButton(){
+  FlatButton loginFlatButton(){
     return FlatButton(
-      onPressed: _blLoginAction,
-      child: Text("自动领取积分"),
+      onPressed: blLoginAction,
+      child: Text("开始刷新娃娃"),
       color: Colors.blue,
       textColor: Colors.white,
     );
   }
 
-  Column _shapeColumn(){
-    return Column(
-      children: [
-        Container(
-          height: 30,
-          alignment: Alignment.center,
-          child: Text('shape button'),
-        ),
-        FlatButton(
-          color: Colors.grey,
-          textColor: Colors.white,
-          onPressed: _blLoginAction,
-          child: Container(
-            height: 100,
-            width: 100,
-            child: Text('圆的'),
-            alignment: Alignment.center,
-          ),
-          shape: CircleBorder(
-            side: BorderSide(
-              width: 2,
-              color: Colors.red,
-              style: BorderStyle.solid,
-              // style: BorderStyle.none,
-            ),
-          ),
-        ),
-      ],
+  FlatButton getDollFlatButton(){
+    return FlatButton(
+      onPressed: getDollAction,
+      child: Text("开始刷新娃娃"),
+      color: Colors.blue,
+      textColor: Colors.white,
     );
   }
 
@@ -155,7 +113,13 @@ class _BLGetDollPage extends State<BLGetDollPage> {
     return ListView(
       padding: EdgeInsets.all(20),
       children: [
-        normalFlatButton(),
+        TextField(),
+        TextField(),
+        TextField(),
+        loginFlatButton(),
+        Text(crystalNumber),
+        TextField(),
+        getDollFlatButton(),
       ],
     );
   }

@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
-import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:flutter_app/APIs/BLApi.dart';
 import 'package:flutter_app/Models/BLResponse.dart';
 import 'package:flutter_app/Models/BLServerInfo.dart';
 import 'dart:io';
-import 'dart:convert';
 import 'package:path_provider/path_provider.dart';
 
 class SecondPage extends StatefulWidget {
@@ -27,21 +25,6 @@ class SecondPage extends StatefulWidget {
   _SecondPage createState() => _SecondPage();
 }
 
-class BL2CookieApi {
-  //改为使用 PersistCookieJar，在文档中有介绍，PersistCookieJar将cookie保留在文件中，因此，如果应用程序退出，则cookie始终存在，除非显式调用delete
-  static PersistCookieJar _cookieJar;
-  static Future<PersistCookieJar> get cookieJar async {
-    // print(_cookieJar);
-    if (_cookieJar == null) {
-      Directory appDocDir = await getApplicationDocumentsDirectory();
-      String appDocPath  = appDocDir.path;
-      print('获取的文件系统目录 appDocPath： ' + appDocPath);
-      _cookieJar = new PersistCookieJar(dir: appDocPath);
-    }
-    return _cookieJar;
-  }
-}
-
 class _SecondPage extends State<SecondPage> {
   int _counter = 0;
 
@@ -58,7 +41,6 @@ class _SecondPage extends State<SecondPage> {
 
     });
   }
-
 
   void _blLoginAction() async
   {
@@ -106,7 +88,6 @@ class _SecondPage extends State<SecondPage> {
       print("Account Logout is " + code.toString());
     }
   }
-
 
   void doUserGetPoint (Dio dio, String accout) async
   {
@@ -168,37 +149,6 @@ class _SecondPage extends State<SecondPage> {
       child: Text("自动领取积分"),
       color: Colors.blue,
       textColor: Colors.white,
-    );
-  }
-
-  Column _shapeColumn(){
-    return Column(
-      children: [
-        Container(
-          height: 30,
-          alignment: Alignment.center,
-          child: Text('shape button'),
-        ),
-        FlatButton(
-          color: Colors.grey,
-          textColor: Colors.white,
-          onPressed: _blLoginAction,
-          child: Container(
-            height: 100,
-            width: 100,
-            child: Text('圆的'),
-            alignment: Alignment.center,
-          ),
-          shape: CircleBorder(
-            side: BorderSide(
-              width: 2,
-              color: Colors.red,
-              style: BorderStyle.solid,
-              // style: BorderStyle.none,
-            ),
-          ),
-        ),
-      ],
     );
   }
 
