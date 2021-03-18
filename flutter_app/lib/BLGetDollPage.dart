@@ -66,7 +66,7 @@ class _BLGetDollPage extends State<BLGetDollPage> {
     print("BL ItemInfo is " + blItemInfoResp.toString());
 
     BLItemInfo info = blItemInfoResp.itemInfo;
-    bool needContiue = true;
+    bool needContinue = true;
     int dollType = 2;
     do {
       Response responseGeDoll = await dio.post(BLApi.BL_GET_DOLL, data:{"type":dollType});
@@ -77,7 +77,7 @@ class _BLGetDollPage extends State<BLGetDollPage> {
             ///没有刷到娃娃，但是成功，需要退出循环
             if (blItemInfoResp.itemInfo.dolllr != info.dolllr + 1)
             {
-              needContiue = false;
+              needContinue = false;
             }
             else {
               info = blItemInfoResp.itemInfo;
@@ -88,7 +88,7 @@ class _BLGetDollPage extends State<BLGetDollPage> {
             ///没有刷到娃娃，但是成功，需要退出循环
             if (blItemInfoResp.itemInfo.dollbz != info.dollbz + 1)
             {
-              needContiue = false;
+              needContinue = false;
             }
             else {
               info = blItemInfoResp.itemInfo;
@@ -99,7 +99,7 @@ class _BLGetDollPage extends State<BLGetDollPage> {
         print("继续刷分");
       }
     }
-    while (info.point > 0 && needContiue);
+    while (info.point > 0 && needContinue);
   }
 
 

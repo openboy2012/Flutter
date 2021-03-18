@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
-import 'package:cookie_jar/cookie_jar.dart';
 import 'package:flutter_app/APIs/BLApi.dart';
 import 'package:flutter_app/Models/BLResponse.dart';
 import 'package:flutter_app/Models/BLServerInfo.dart';
-import 'dart:io';
-import 'package:path_provider/path_provider.dart';
 
 class SecondPage extends StatefulWidget {
   SecondPage({Key key, this.title}) : super(key: key);
@@ -26,21 +23,6 @@ class SecondPage extends StatefulWidget {
 }
 
 class _SecondPage extends State<SecondPage> {
-  int _counter = 0;
-
-  String responseText;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-
-    });
-  }
 
   void _blLoginAction() async
   {
@@ -80,16 +62,16 @@ class _SecondPage extends State<SecondPage> {
       print("Account Login is " + code.toString());
       ///登陆成功
       if (code == 0) {
-        await doUserGetPoint(dio, params["account"]);
+        doUserGetPoint(dio, params["account"]);
       }
 
       Response responseLogout = await dio.post(BLApi.BL_USER_LOGOUT);
-      code = BLResponse.fromJson(responseLogin.data).code;
+      code = BLResponse.fromJson(responseLogout.data).code;
       print("Account Logout is " + code.toString());
     }
   }
 
-  void doUserGetPoint (Dio dio, String accout) async
+  void doUserGetPoint (Dio dio, String account) async
   {
     ///获取绑定列表
     Response responseServer = await dio.get(BLApi.BL_SERVER_LIST);
@@ -116,7 +98,7 @@ class _SecondPage extends State<SecondPage> {
                   .toString());
 
           ///开始获取积分
-          await getAllPointByUser(dio, serverInfo.nickname);
+          getAllPointByUser(dio, serverInfo.nickname);
         }
       }
     }
@@ -130,7 +112,7 @@ class _SecondPage extends State<SecondPage> {
     {
       Response responsePoint = await dio.post(BLApi.BL_GET_POINT, data: {"type":i});
       BLResponse response = BLResponse.fromJson(responsePoint.data);
-      print(nickname + " getPoint type is " + i.toString() + " Reuslt is " + response.code.toString());
+      print(nickname + " getPoint type:" + i.toString() + " Result:" + response.code.toString() + " msg:" + response.msg);
       ///没登陆过游戏的，跳出循环
       // if (response.code != 0 && i == 0)
       // {

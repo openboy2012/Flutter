@@ -28,7 +28,7 @@ class BLItemInfoResp {
   factory BLItemInfoResp.fromGetDollJson(Map<String, dynamic> json) => BLItemInfoResp(
     msg: json["msg"],
     code: json["code"],
-    itemInfo: BLItemInfo.fromJson(json["newItemInfo"]),
+    itemInfo: json["newItemInfo"] == null ? null : BLItemInfo.fromJson(json["newItemInfo"]),
   );
 
   Map<String, dynamic> toJson() => {
