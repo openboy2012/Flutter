@@ -62,7 +62,7 @@ class _SecondPage extends State<SecondPage> {
       print("Account Login is " + code.toString());
       ///登陆成功
       if (code == 0) {
-        doUserGetPoint(dio, params["account"]);
+        await doUserGetPoint(dio, params["account"]);
       }
 
       Response responseLogout = await dio.post(BLApi.BL_USER_LOGOUT);
@@ -71,11 +71,10 @@ class _SecondPage extends State<SecondPage> {
     }
   }
 
-  void doUserGetPoint (Dio dio, String account) async
+  Future doUserGetPoint (Dio dio, String account) async
   {
     ///获取绑定列表
     Response responseServer = await dio.get(BLApi.BL_SERVER_LIST);
-    print("ServerList is" + responseServer.data.toString());
     var serverList = BlServerInfoResp.fromJson(responseServer.data);
 
     var platformInfos = serverList.platformList;
@@ -98,14 +97,14 @@ class _SecondPage extends State<SecondPage> {
                   .toString());
 
           ///开始获取积分
-          getAllPointByUser(dio, serverInfo.nickname);
+          await getAllPointByUser(dio, serverInfo.nickname);
         }
       }
     }
   }
 
   ///获取积分
-  void getAllPointByUser (Dio dio, String nickname) async
+  Future getAllPointByUser (Dio dio, String nickname) async
   {
     ///按照类型开始领取积分
     for (int i = 0; i < 5; i++)

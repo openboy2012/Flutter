@@ -41,15 +41,57 @@ class _BLGetDollPage extends State<BLGetDollPage> {
 
     Map<String, dynamic> params = new Map();
     params["loginType"] = 0;
-    params["account"] = '1011550377';
-    params["passWord"] = 'asdf1234';
+    // params["account"] = '1011550377';
+    // params["passWord"] = 'asdf1234';
+    params["account"] = '18657349251';
+    params["passWord"] = 'dkl1234';
+    // params["account"] = '18043172036';
+    // params["passWord"] = 'renwei1234';
+    // params["account"] = '1010473892';
+    // params["passWord"] = 'liuyixian11';
     ///登陆账号
     Response responseLogin = await dio.post(BLApi.BL_USER_LOGIN, data: params);
     int code = BLResponse.fromJson(responseLogin.data).code;
     print("Account Login is " + code.toString());
+
+    String roleName = "钻石爸比";
+    // String roleName = "超光年";
+    // String roleName = "打的狗子改名";
+    // String roleName = "收活跃玩家";
     ///登陆成功
     if (code == 0) {
-      // doUserGetDoll(this.dio, params["account"]);
+      ///获取绑定列表
+      Response responseServer = await dio.get(BLApi.BL_SERVER_LIST);
+      var serverList = BlServerInfoResp.fromJson(responseServer.data);
+
+      var platformInfos = serverList.platformList;
+      for (BLPlatformInfo platformInfo in platformInfos) {
+        ///遍历平台信息
+        if (platformInfo.name == "IOS") {
+          for (BLServerInfo serverInfo in platformInfo.serveList) {
+            ///判断是否是要刷分的昵称
+            if (serverInfo.nickname == roleName)
+            {
+              Map<String, dynamic> params = new Map();
+              params["phone"] = "18888888888";
+              params["serverId"] = serverInfo.serverId;
+
+              ///绑定账号内容
+              Response responseBind = await dio.post(
+                  BLApi.BL_USER_BIND_ROLE, data: params);
+
+              print("BL user bind role is " + serverInfo.nickname + " is " +
+                  BLResponse
+                      .fromJson(responseBind.data)
+                      .code
+                      .toString());
+
+              ///开始获取积分
+              getDollAction();
+            }
+          }
+        }
+      }
     }
 
     // Response responseLogout = await dio.post(BLApi.BL_USER_LOGOUT);
@@ -61,7 +103,6 @@ class _BLGetDollPage extends State<BLGetDollPage> {
   {
     ///获取绑定列表
     Response responseItemInfo = await this.dio.get(BLApi.BL_USER_DOLL_INFO);
-    print("BL ItemInfo is " + responseItemInfo.data.toString());
     var blItemInfoResp = BLItemInfoResp.fromGetItemJson(responseItemInfo.data);
     BLItemInfo info = blItemInfoResp.itemInfo;
     print("刷分前的信息[积分:" + info.point.toString() +
@@ -69,7 +110,7 @@ class _BLGetDollPage extends State<BLGetDollPage> {
           "白哉娃娃:" + info.dollbz.toString() + "]");
     bool needContinue = true;
     int dollType = 2; ///先摇白哉
-    int crystalNumber = 1; ///想要摇的水晶数量
+    int crystalNumber = 15; ///想要摇的水晶数量
     do {
       Response responseGeDoll = await dio.post(BLApi.BL_GET_DOLL, data:{"type":dollType});
       blItemInfoResp = BLItemInfoResp.fromGetDollJson(responseGeDoll.data);
