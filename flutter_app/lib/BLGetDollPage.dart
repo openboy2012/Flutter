@@ -63,11 +63,13 @@ class _BLGetDollPage extends State<BLGetDollPage> {
     Response responseItemInfo = await this.dio.get(BLApi.BL_USER_DOLL_INFO);
     print("BL ItemInfo is " + responseItemInfo.data.toString());
     var blItemInfoResp = BLItemInfoResp.fromGetItemJson(responseItemInfo.data);
-    print("BL ItemInfo is " + blItemInfoResp.toString());
-
     BLItemInfo info = blItemInfoResp.itemInfo;
+    print("刷分前的信息[积分:" + info.point.toString() +
+          "蓝染娃娃:" + info.dolllr.toString() +
+          "白哉娃娃:" + info.dollbz.toString() + "]");
     bool needContinue = true;
-    int dollType = 2;
+    int dollType = 2; ///先摇白哉
+    int crystalNumber = 1; ///想要摇的水晶数量
     do {
       Response responseGeDoll = await dio.post(BLApi.BL_GET_DOLL, data:{"type":dollType});
       blItemInfoResp = BLItemInfoResp.fromGetDollJson(responseGeDoll.data);
@@ -78,9 +80,27 @@ class _BLGetDollPage extends State<BLGetDollPage> {
             if (blItemInfoResp.itemInfo.dolllr != info.dolllr + 1)
             {
               needContinue = false;
+              print("刷到环，任务强制结束 [积分:" + info.point.toString() +
+                  " 蓝染娃娃数量:" + info.dolllr.toString() +
+                  " 白哉娃娃数量:" + info.dollbz.toString() + "]"
+              );
             }
             else {
               info = blItemInfoResp.itemInfo;
+              print("刷到一个蓝染 [积分:" + info.point.toString() +
+                  " 蓝染娃娃数量:" + info.dolllr.toString() +
+                  " 白哉娃娃数量:" + info.dollbz.toString() + "]"
+              );
+              if (info.dolllr < 3 * crystalNumber) {
+                dollType = 3;
+              }
+              else {
+                needContinue = false;
+                print("完成刷分任务[积分:" + info.point.toString() +
+                    " 蓝染娃娃数量:" + info.dolllr.toString() +
+                    " 白哉娃娃数量:" + info.dollbz.toString() + "]"
+                );
+              }
             }
           }
           ///白哉
@@ -88,15 +108,33 @@ class _BLGetDollPage extends State<BLGetDollPage> {
             ///没有刷到娃娃，但是成功，需要退出循环
             if (blItemInfoResp.itemInfo.dollbz != info.dollbz + 1)
             {
+              print("刷到环，任务强制结束 [积分:" + info.point.toString() +
+                  " 蓝染娃娃数量:" + info.dolllr.toString() +
+                  " 白哉娃娃数量:" + info.dollbz.toString() + "]"
+              );
               needContinue = false;
             }
             else {
               info = blItemInfoResp.itemInfo;
+              print("刷到一个白哉 [积分:" + info.point.toString() +
+                  " 蓝染娃娃数量:" + info.dolllr.toString() +
+                  " 白哉娃娃数量:" + info.dollbz.toString() + "]"
+              );
+              if (info.dollbz < 4 * crystalNumber) {
+                dollType = 2;
+              }
+              else {
+                dollType = 3;
+                print("更新刷新蓝染娃娃 [积分:" + info.point.toString() +
+                    " 蓝染娃娃数量:" + info.dolllr.toString() +
+                    " 白哉娃娃数量:" + info.dollbz.toString() + "]"
+                );
+              }
             }
           }
       }
       else {
-        print("继续刷分");
+        print("继续刷分:"+ blItemInfoResp.code.toString() + " msg:" +blItemInfoResp.msg);
       }
     }
     while (info.point > 0 && needContinue);
