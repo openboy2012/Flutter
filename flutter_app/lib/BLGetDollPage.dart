@@ -41,23 +41,26 @@ class _BLGetDollPage extends State<BLGetDollPage> {
 
     Map<String, dynamic> params = new Map();
     params["loginType"] = 0;
-    // params["account"] = '1011550377';
-    // params["passWord"] = 'asdf1234';
-    params["account"] = '18657349251';
-    params["passWord"] = 'dkl1234';
+    params["account"] = '1011550377';
+    params["passWord"] = 'asdf1234';
+    // params["account"] = '18657349251';
+    // params["passWord"] = 'dkl1234';
     // params["account"] = '18043172036';
     // params["passWord"] = 'renwei1234';
     // params["account"] = '1010473892';
     // params["passWord"] = 'liuyixian11';
+    // params["account"] = '1009872400';
+    // params["passWord"] = 'zzz56789';
     ///登陆账号
     Response responseLogin = await dio.post(BLApi.BL_USER_LOGIN, data: params);
     int code = BLResponse.fromJson(responseLogin.data).code;
     print("Account Login is " + code.toString());
 
-    String roleName = "钻石爸比";
+    // String roleName = "钻石爸比";
     // String roleName = "超光年";
-    // String roleName = "打的狗子改名";
+    String roleName = "打的狗子改名";
     // String roleName = "收活跃玩家";
+    // String roleName = "照小坏";
     ///登陆成功
     if (code == 0) {
       ///获取绑定列表
@@ -110,9 +113,9 @@ class _BLGetDollPage extends State<BLGetDollPage> {
           "白哉娃娃:" + info.dollbz.toString() + "]");
     bool needContinue = true;
     int dollType = 2; ///先摇白哉
-    int crystalNumber = 15; ///想要摇的水晶数量
+    int crystalNumber = 1; ///想要摇的水晶数量
     do {
-      Response responseGeDoll = await dio.post(BLApi.BL_GET_DOLL, data:{"type":dollType});
+      Response responseGeDoll = await this.dio.post(BLApi.BL_GET_DOLL, data:{"type":dollType});
       blItemInfoResp = BLItemInfoResp.fromGetDollJson(responseGeDoll.data);
       if (blItemInfoResp.code == 0) { ///请求成功
           ///蓝染
@@ -133,7 +136,14 @@ class _BLGetDollPage extends State<BLGetDollPage> {
                   " 白哉娃娃数量:" + info.dollbz.toString() + "]"
               );
               if (info.dolllr < 3 * crystalNumber) {
-                dollType = 3;
+                ///被3整数以后转换下类型
+                if (info.dolllr % 3 == 0) {
+                  print("转换抽取类型为白哉娃娃");
+                  dollType = 2;
+                }
+                else {
+                 dollType = 3;
+                }
               }
               else {
                 needContinue = false;
@@ -162,7 +172,14 @@ class _BLGetDollPage extends State<BLGetDollPage> {
                   " 白哉娃娃数量:" + info.dollbz.toString() + "]"
               );
               if (info.dollbz < 4 * crystalNumber) {
-                dollType = 2;
+                ///被4整数以后转换下类型
+                if (info.dolllr % 4 == 0) {
+                  print("转换抽取类型为蓝染娃娃");
+                  dollType = 3;
+                }
+                else {
+                  dollType = 2;
+                }
               }
               else {
                 dollType = 3;

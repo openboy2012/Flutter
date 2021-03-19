@@ -24,6 +24,11 @@ class SecondPage extends StatefulWidget {
 
 class _SecondPage extends State<SecondPage> {
 
+  static Map<String, dynamic> serverKeyValues = {"18657349251":"流魂街51区",
+    "18043172036":"流魂街52区","1010473892":"流魂街103区","1011550377":"流魂街51区"};
+
+  String _printText = "开始领取积分";
+
   void _blLoginAction() async
   {
     Map<String, dynamic> headers = new Map();
@@ -32,6 +37,9 @@ class _SecondPage extends State<SecondPage> {
       headers:headers,
       baseUrl:BLApi.BL_BASE_URL,
     );
+
+    _printText = "开始领取积分";
+
     Dio dio = new Dio(options);
 
     List<Map<String, dynamic>> accounts = new List();
@@ -39,7 +47,7 @@ class _SecondPage extends State<SecondPage> {
     params["loginType"] = 0;
     params["account"] = '1011550377';
     params["passWord"] = 'asdf1234';
-    // accounts.add(params);
+    accounts.add(params);
     params = new Map();
     params["loginType"] = 0;
     params["account"] = '18657349251';
@@ -59,7 +67,7 @@ class _SecondPage extends State<SecondPage> {
       ///登陆账号
       Response responseLogin = await dio.post(BLApi.BL_USER_LOGIN, data: params);
       int code = BLResponse.fromJson(responseLogin.data).code;
-      print("Account Login is " + code.toString());
+      blPrintTextView("账号登陆状态:" + code.toString());
       ///登陆成功
       if (code == 0) {
         await doUserGetPoint(dio, params["account"]);
@@ -67,8 +75,16 @@ class _SecondPage extends State<SecondPage> {
 
       Response responseLogout = await dio.post(BLApi.BL_USER_LOGOUT);
       code = BLResponse.fromJson(responseLogout.data).code;
-      print("Account Logout is " + code.toString());
+      blPrintTextView("账号登出状态:" + code.toString());
     }
+  }
+
+  void blPrintTextView(String line) {
+    setState(() {
+      _printText = _printText + "\n";
+      _printText = _printText + line;
+    });
+    print(line);
   }
 
   Future doUserGetPoint (Dio dio, String account) async
@@ -82,22 +98,25 @@ class _SecondPage extends State<SecondPage> {
       ///遍历平台信息
       if (platformInfo.name == "IOS") {
         for (BLServerInfo serverInfo in platformInfo.serveList) {
-          Map<String, dynamic> params = new Map();
-          params["phone"] = "18888888888";
-          params["serverId"] = serverInfo.serverId;
+          ///匹配正确的账号信息
+          if (serverInfo.name == serverKeyValues[account]) {
+            Map<String, dynamic> params = new Map();
+            params["phone"] = "18888888888";
+            params["serverId"] = serverInfo.serverId;
 
-          ///绑定账号内容
-          Response responseBind = await dio.post(
-              BLApi.BL_USER_BIND_ROLE, data: params);
+            ///绑定账号内容
+            Response responseBind = await dio.post(
+                BLApi.BL_USER_BIND_ROLE, data: params);
 
-          print("BL user bind role is " + serverInfo.nickname + " is " +
-              BLResponse
-                  .fromJson(responseBind.data)
-                  .code
-                  .toString());
+            print("BL user bind role is " + serverInfo.nickname + " is " +
+                BLResponse
+                    .fromJson(responseBind.data)
+                    .code
+                    .toString());
 
-          ///开始获取积分
-          await getAllPointByUser(dio, serverInfo.nickname);
+            ///开始获取积分
+            await getAllPointByUser(dio, serverInfo.nickname);
+          }
         }
       }
     }
@@ -111,7 +130,7 @@ class _SecondPage extends State<SecondPage> {
     {
       Response responsePoint = await dio.post(BLApi.BL_GET_POINT, data: {"type":i});
       BLResponse response = BLResponse.fromJson(responsePoint.data);
-      print(nickname + " getPoint type:" + i.toString() + " Result:" + response.code.toString() + " msg:" + response.msg);
+      blPrintTextView(nickname + " getPoint type:" + i.toString() + " Result:" + response.code.toString() + " msg:" + response.msg);
       ///没登陆过游戏的，跳出循环
       // if (response.code != 0 && i == 0)
       // {
@@ -138,6 +157,15 @@ class _SecondPage extends State<SecondPage> {
       padding: EdgeInsets.all(20),
       children: [
         normalFlatButton(),
+        SingleChildScrollView(
+          child: Container(
+            color: Colors.black,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: 300.0),
+              child: Text(_printText, style: TextStyle(color: Colors.white),),
+            ),
+          ),
+        )
       ],
     );
   }
