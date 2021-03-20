@@ -27,7 +27,17 @@ class BLGetDollPage extends StatefulWidget {
 class _BLGetDollPage extends State<BLGetDollPage> {
 
   String crystalNumber;
+  String _printText = "开始刷分";
   Dio dio;
+
+  void blPrintTextView(String line) {
+    setState(() {
+      _printText = _printText + "\n";
+      _printText = _printText + line;
+    });
+    print(line);
+  }
+
 
   void blLoginAction() async
   {
@@ -38,6 +48,7 @@ class _BLGetDollPage extends State<BLGetDollPage> {
       baseUrl:BLApi.BL_BASE_URL,
     );
     this.dio = new Dio(options);
+    _printText = "开始刷分";
 
     Map<String, dynamic> params = new Map();
     params["loginType"] = 0;
@@ -54,7 +65,7 @@ class _BLGetDollPage extends State<BLGetDollPage> {
     ///登陆账号
     Response responseLogin = await dio.post(BLApi.BL_USER_LOGIN, data: params);
     int code = BLResponse.fromJson(responseLogin.data).code;
-    print("Account Login is " + code.toString());
+    blPrintTextView("用户登陆:" + code.toString());
 
     // String roleName = "钻石爸比";
     // String roleName = "超光年";
@@ -83,7 +94,7 @@ class _BLGetDollPage extends State<BLGetDollPage> {
               Response responseBind = await dio.post(
                   BLApi.BL_USER_BIND_ROLE, data: params);
 
-              print("BL user bind role is " + serverInfo.nickname + " is " +
+              blPrintTextView("账号绑定角色:" + serverInfo.nickname + " 结果:" +
                   BLResponse
                       .fromJson(responseBind.data)
                       .code
@@ -108,7 +119,7 @@ class _BLGetDollPage extends State<BLGetDollPage> {
     Response responseItemInfo = await this.dio.get(BLApi.BL_USER_DOLL_INFO);
     var blItemInfoResp = BLItemInfoResp.fromGetItemJson(responseItemInfo.data);
     BLItemInfo info = blItemInfoResp.itemInfo;
-    print("刷分前的信息[积分:" + info.point.toString() +
+    blPrintTextView("刷分前的信息[积分:" + info.point.toString() +
           "蓝染娃娃:" + info.dolllr.toString() +
           "白哉娃娃:" + info.dollbz.toString() + "]");
     bool needContinue = true;
@@ -124,21 +135,21 @@ class _BLGetDollPage extends State<BLGetDollPage> {
             if (blItemInfoResp.itemInfo.dolllr != info.dolllr + 1)
             {
               needContinue = false;
-              print("刷到环，任务强制结束 [积分:" + info.point.toString() +
+              blPrintTextView("刷到环，任务强制结束 [积分:" + info.point.toString() +
                   " 蓝染娃娃数量:" + info.dolllr.toString() +
                   " 白哉娃娃数量:" + info.dollbz.toString() + "]"
               );
             }
             else {
               info = blItemInfoResp.itemInfo;
-              print("刷到一个蓝染 [积分:" + info.point.toString() +
+              blPrintTextView("刷到一个蓝染 [积分:" + info.point.toString() +
                   " 蓝染娃娃数量:" + info.dolllr.toString() +
                   " 白哉娃娃数量:" + info.dollbz.toString() + "]"
               );
               if (info.dolllr < 3 * crystalNumber) {
                 ///被3整数以后转换下类型
                 if (info.dolllr % 3 == 0) {
-                  print("转换抽取类型为白哉娃娃");
+                  blPrintTextView("转换抽取类型为白哉娃娃");
                   dollType = 2;
                 }
                 else {
@@ -147,7 +158,7 @@ class _BLGetDollPage extends State<BLGetDollPage> {
               }
               else {
                 needContinue = false;
-                print("完成刷分任务[积分:" + info.point.toString() +
+                blPrintTextView("完成刷分任务[积分:" + info.point.toString() +
                     " 蓝染娃娃数量:" + info.dolllr.toString() +
                     " 白哉娃娃数量:" + info.dollbz.toString() + "]"
                 );
@@ -159,7 +170,7 @@ class _BLGetDollPage extends State<BLGetDollPage> {
             ///没有刷到娃娃，但是成功，需要退出循环
             if (blItemInfoResp.itemInfo.dollbz != info.dollbz + 1)
             {
-              print("刷到环，任务强制结束 [积分:" + info.point.toString() +
+              blPrintTextView("刷到环，任务强制结束 [积分:" + info.point.toString() +
                   " 蓝染娃娃数量:" + info.dolllr.toString() +
                   " 白哉娃娃数量:" + info.dollbz.toString() + "]"
               );
@@ -167,14 +178,14 @@ class _BLGetDollPage extends State<BLGetDollPage> {
             }
             else {
               info = blItemInfoResp.itemInfo;
-              print("刷到一个白哉 [积分:" + info.point.toString() +
+              blPrintTextView("刷到一个白哉 [积分:" + info.point.toString() +
                   " 蓝染娃娃数量:" + info.dolllr.toString() +
                   " 白哉娃娃数量:" + info.dollbz.toString() + "]"
               );
               if (info.dollbz < 4 * crystalNumber) {
                 ///被4整数以后转换下类型
                 if (info.dolllr % 4 == 0) {
-                  print("转换抽取类型为蓝染娃娃");
+                  blPrintTextView("转换抽取类型为蓝染娃娃");
                   dollType = 3;
                 }
                 else {
@@ -183,7 +194,7 @@ class _BLGetDollPage extends State<BLGetDollPage> {
               }
               else {
                 dollType = 3;
-                print("更新刷新蓝染娃娃 [积分:" + info.point.toString() +
+                blPrintTextView("更新刷新蓝染娃娃 [积分:" + info.point.toString() +
                     " 蓝染娃娃数量:" + info.dolllr.toString() +
                     " 白哉娃娃数量:" + info.dollbz.toString() + "]"
                 );
@@ -192,7 +203,7 @@ class _BLGetDollPage extends State<BLGetDollPage> {
           }
       }
       else {
-        print("继续刷分:"+ blItemInfoResp.code.toString() + " msg:" +blItemInfoResp.msg);
+        blPrintTextView("继续刷分:"+ blItemInfoResp.code.toString() + " 消息内容:" +blItemInfoResp.msg);
       }
     }
     while (info.point > 0 && needContinue);

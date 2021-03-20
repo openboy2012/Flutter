@@ -145,6 +145,7 @@ class _SecondPage extends State<SecondPage> {
 
   FlatButton normalFlatButton(){
     return FlatButton(
+      minWidth: 320,
       onPressed: _blLoginAction,
       child: Text("自动领取积分"),
       color: Colors.blue,
@@ -152,21 +153,12 @@ class _SecondPage extends State<SecondPage> {
     );
   }
 
-  ListView _listView() {
+  ListView _columns() {
     return ListView(
-      padding: EdgeInsets.all(20),
-      children: [
-        normalFlatButton(),
-        SingleChildScrollView(
-          child: Container(
-            color: Colors.black,
-            child: ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: 300.0),
-              child: Text(_printText, style: TextStyle(color: Colors.white),),
-            ),
-          ),
-        )
-      ],
+        children: [
+          normalFlatButton(),
+          Text(_printText, style: TextStyle(color: Colors.black54),),
+        ]
     );
   }
 
@@ -184,7 +176,7 @@ class _SecondPage extends State<SecondPage> {
         // the App.build method, and use it to set our appbar title.
         title: Text("死神激斗领取积分"),
       ),
-      body: _listView(),
+      body: _columns(),
     );
   }
 }
