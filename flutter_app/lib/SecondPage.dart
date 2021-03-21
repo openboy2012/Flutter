@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_app/APIs/BLApi.dart';
 import 'package:flutter_app/Models/BLResponse.dart';
 import 'package:flutter_app/Models/BLServerInfo.dart';
+import 'package:flutter_app/Models/BLItemInfo.dart';
 
 class SecondPage extends StatefulWidget {
   SecondPage({Key key, this.title}) : super(key: key);
@@ -108,7 +109,7 @@ class _SecondPage extends State<SecondPage> {
             Response responseBind = await dio.post(
                 BLApi.BL_USER_BIND_ROLE, data: params);
 
-            print("BL user bind role is " + serverInfo.nickname + " is " +
+            blPrintTextView("当前绑定的游戏昵称:" + serverInfo.nickname + " 绑定结果:" +
                 BLResponse
                     .fromJson(responseBind.data)
                     .code
@@ -139,8 +140,12 @@ class _SecondPage extends State<SecondPage> {
     }
 
     ///获取已经获得的娃娃信息
-    // Response responseGetPoint = await dio.get(BLApi.BL_USER_DOLL_INFO);
-    // print("Point Info is" + responseGetPoint.data.toString());
+    Response responseItemInfo = await dio.get(BLApi.BL_USER_DOLL_INFO);
+    var blItemInfoResp = BLItemInfoResp.fromGetItemJson(responseItemInfo.data);
+    BLItemInfo info = blItemInfoResp.itemInfo;
+    blPrintTextView("当前账号的信息[积分:" + info.point.toString() +
+        "蓝染娃娃:" + info.dolllr.toString() +
+        "白哉娃娃:" + info.dollbz.toString() + "]");
   }
 
   FlatButton normalFlatButton(){
@@ -155,6 +160,7 @@ class _SecondPage extends State<SecondPage> {
 
   ListView _columns() {
     return ListView(
+        padding: EdgeInsets.all(20),
         children: [
           normalFlatButton(),
           Text(_printText, style: TextStyle(color: Colors.black54),),

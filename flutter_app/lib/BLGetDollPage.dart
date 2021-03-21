@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_app/APIs/BLApi.dart';
@@ -26,7 +27,10 @@ class BLGetDollPage extends StatefulWidget {
 
 class _BLGetDollPage extends State<BLGetDollPage> {
 
-  String crystalNumber;
+  num crystalNumber;
+  String account;
+  String password;
+  String nickname;
   String _printText = "开始刷分";
   Dio dio;
 
@@ -228,17 +232,47 @@ class _BLGetDollPage extends State<BLGetDollPage> {
     );
   }
 
+  void accountChanged(String account) {
+
+  }
+
+  void passwordChanged(String pwd) {
+
+  }
+
+  void nicknameChanged(String nickName) {
+
+  }
+
+  void crystalNumberChanged(String count) {
+
+  }
+
   ListView _listView() {
     return ListView(
       padding: EdgeInsets.all(20),
       children: [
-        TextField(),
-        TextField(),
-        TextField(),
+        TextField(
+          onChanged: accountChanged,
+          decoration:
+          InputDecoration(labelText: '账户名'),),
+        TextField(
+          obscureText: true,
+          onChanged: passwordChanged,
+          decoration:
+          InputDecoration(labelText: '密码'),
+        ),
+        TextField(
+          onChanged:nicknameChanged,
+          decoration:
+          InputDecoration(labelText: '游戏昵称'),),
         loginFlatButton(),
-        // Text(crystalNumber),
-        TextField(),
+        TextField(
+          onChanged: crystalNumberChanged,
+          decoration:
+          InputDecoration(labelText: '水晶数量'),),
         getDollFlatButton(),
+        Text(_printText, style: TextStyle(color: Colors.black54),),
       ],
     );
   }
