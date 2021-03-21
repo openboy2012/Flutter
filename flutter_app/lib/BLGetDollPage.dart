@@ -27,11 +27,12 @@ class BLGetDollPage extends StatefulWidget {
 
 class _BLGetDollPage extends State<BLGetDollPage> {
 
-  num crystalNumber;
-  String account;
-  String password;
-  String nickname;
-  String _printText = "开始刷分";
+  num _crystalNumber;
+  String _account;
+  String _password;
+  String _nickname;
+  String _printText = "准备刷分";
+  BLItemInfoResp loginResp;
   Dio dio;
 
   void blPrintTextView(String line) {
@@ -42,9 +43,19 @@ class _BLGetDollPage extends State<BLGetDollPage> {
     print(line);
   }
 
-
   void blLoginAction() async
   {
+
+    _printText = "准备刷分";
+
+    if (_account == null ||
+        _password == null ||
+        _account.length == 0 ||
+        _password.length == 0) {
+      blPrintTextView("请输入账号密码");
+      return;
+    }
+
     Map<String, dynamic> headers = new Map();
     headers["token"] = BLApi.BL_WX_TOKEN;
     BaseOptions options = new BaseOptions(
@@ -52,12 +63,13 @@ class _BLGetDollPage extends State<BLGetDollPage> {
       baseUrl:BLApi.BL_BASE_URL,
     );
     this.dio = new Dio(options);
-    _printText = "开始刷分";
 
     Map<String, dynamic> params = new Map();
     params["loginType"] = 0;
-    params["account"] = '1011550377';
-    params["passWord"] = 'asdf1234';
+    params["account"] = _account;
+    params["passWord"] = _password;
+    // params["account"] = '1011550377';
+    // params["passWord"] = 'asdf1234';
     // params["account"] = '18657349251';
     // params["passWord"] = 'dkl1234';
     // params["account"] = '18043172036';
@@ -73,9 +85,16 @@ class _BLGetDollPage extends State<BLGetDollPage> {
 
     // String roleName = "钻石爸比";
     // String roleName = "超光年";
-    String roleName = "打的狗子改名";
+    // String roleName = "打的狗子改名";
     // String roleName = "收活跃玩家";
     // String roleName = "照小坏";
+
+    if (_nickname == null ||
+    _nickname.length == 0)
+    {
+      blPrintTextView("请设置角色昵称");
+      return;
+    }
     ///登陆成功
     if (code == 0) {
       ///获取绑定列表
@@ -88,7 +107,7 @@ class _BLGetDollPage extends State<BLGetDollPage> {
         if (platformInfo.name == "IOS") {
           for (BLServerInfo serverInfo in platformInfo.serveList) {
             ///判断是否是要刷分的昵称
-            if (serverInfo.nickname == roleName)
+            if (serverInfo.nickname == _nickname)
             {
               Map<String, dynamic> params = new Map();
               params["phone"] = "18888888888";
@@ -104,8 +123,13 @@ class _BLGetDollPage extends State<BLGetDollPage> {
                       .code
                       .toString());
 
-              ///开始获取积分
-              getDollAction();
+              Response responseItemInfo = await this.dio.get(BLApi.BL_USER_DOLL_INFO);
+              var blItemInfoResp = BLItemInfoResp.fromGetItemJson(responseItemInfo.data);
+              BLItemInfo info = blItemInfoResp.itemInfo;
+              blPrintTextView("刷分前的信息[积分:" + info.point.toString() +
+                  "蓝染娃娃:" + info.dolllr.toString() +
+                  "白哉娃娃:" + info.dollbz.toString() + "]");
+              this.loginResp = blItemInfoResp;
             }
           }
         }
@@ -119,16 +143,22 @@ class _BLGetDollPage extends State<BLGetDollPage> {
 
   void getDollAction () async
   {
+    var blItemInfoResp = this.loginResp;
     ///获取绑定列表
-    Response responseItemInfo = await this.dio.get(BLApi.BL_USER_DOLL_INFO);
-    var blItemInfoResp = BLItemInfoResp.fromGetItemJson(responseItemInfo.data);
+    // Response responseItemInfo = await this.dio.get(BLApi.BL_USER_DOLL_INFO);
+    // var blItemInfoResp = BLItemInfoResp.fromGetItemJson(responseItemInfo.data);
     BLItemInfo info = blItemInfoResp.itemInfo;
-    blPrintTextView("刷分前的信息[积分:" + info.point.toString() +
-          "蓝染娃娃:" + info.dolllr.toString() +
-          "白哉娃娃:" + info.dollbz.toString() + "]");
+    // blPrintTextView("刷分前的信息[积分:" + info.point.toString() +
+    //       "蓝染娃娃:" + info.dolllr.toString() +
+    //       "白哉娃娃:" + info.dollbz.toString() + "]");
     bool needContinue = true;
     int dollType = 2; ///先摇白哉
-    int crystalNumber = 1; ///想要摇的水晶数量
+    // int _crystalNumber = 1; ///想要摇的水晶数量
+    if (_crystalNumber == 0)
+    {
+      blPrintTextView("请输入数量");
+      return;
+    }
     do {
       Response responseGeDoll = await this.dio.post(BLApi.BL_GET_DOLL, data:{"type":dollType});
       blItemInfoResp = BLItemInfoResp.fromGetDollJson(responseGeDoll.data);
@@ -150,14 +180,14 @@ class _BLGetDollPage extends State<BLGetDollPage> {
                   " 蓝染娃娃数量:" + info.dolllr.toString() +
                   " 白哉娃娃数量:" + info.dollbz.toString() + "]"
               );
-              if (info.dolllr < 3 * crystalNumber) {
+              if (info.dolllr < 3 * _crystalNumber) {
                 ///被3整数以后转换下类型
                 if (info.dolllr % 3 == 0) {
                   blPrintTextView("转换抽取类型为白哉娃娃");
                   dollType = 2;
                 }
                 else {
-                 dollType = 3;
+                  dollType = 3;
                 }
               }
               else {
@@ -186,7 +216,7 @@ class _BLGetDollPage extends State<BLGetDollPage> {
                   " 蓝染娃娃数量:" + info.dolllr.toString() +
                   " 白哉娃娃数量:" + info.dollbz.toString() + "]"
               );
-              if (info.dollbz < 4 * crystalNumber) {
+              if (info.dollbz < 4 * _crystalNumber) {
                 ///被4整数以后转换下类型
                 if (info.dolllr % 4 == 0) {
                   blPrintTextView("转换抽取类型为蓝染娃娃");
@@ -207,12 +237,12 @@ class _BLGetDollPage extends State<BLGetDollPage> {
           }
       }
       else {
+        info = blItemInfoResp.itemInfo;
         blPrintTextView("继续刷分:"+ blItemInfoResp.code.toString() + " 消息内容:" +blItemInfoResp.msg);
       }
     }
     while (info.point > 0 && needContinue);
   }
-
 
   FlatButton loginFlatButton(){
     return FlatButton(
@@ -233,19 +263,19 @@ class _BLGetDollPage extends State<BLGetDollPage> {
   }
 
   void accountChanged(String account) {
-
+    _account = account;
   }
 
   void passwordChanged(String pwd) {
-
+    _password = pwd;
   }
 
-  void nicknameChanged(String nickName) {
-
+  void nicknameChanged(String nickname) {
+    _nickname = nickname;
   }
 
   void crystalNumberChanged(String count) {
-
+    _crystalNumber = num.parse(count);
   }
 
   ListView _listView() {
