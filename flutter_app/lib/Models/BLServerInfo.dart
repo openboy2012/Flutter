@@ -13,16 +13,24 @@ class BlServerInfoResp {
     this.msg,
     this.code,
     this.platformList,
+    this.serverList,
   });
 
   String msg;
   int code;
   List<BLPlatformInfo> platformList;
+  List<BLServerInfo> serverList;
 
   factory BlServerInfoResp.fromJson(Map<String, dynamic> json) => BlServerInfoResp(
     msg: json["msg"],
     code: json["code"],
     platformList: List<BLPlatformInfo>.from(json["serverList"].map((x) => BLPlatformInfo.fromJson(x))),
+  );
+
+  factory BlServerInfoResp.fromZPJson(Map<String, dynamic> json) => BlServerInfoResp(
+    msg: json["msg"],
+    code: json["code"],
+    serverList: List<BLServerInfo>.from(json["server"]["IOS"]["流魂街"].map((x) => BLServerInfo.fromZPJson(x))),
   );
 
   Map<String, dynamic> toJson() => {
@@ -74,6 +82,12 @@ class BLServerInfo {
     serverId: json["id"],
     nickname: json["value"][0]["name"],
     roleId: json["value"][0]["id"],
+  );
+
+  factory BLServerInfo.fromZPJson(Map<String, dynamic> json) => BLServerInfo(
+    name: json["serverName"],
+    serverId: json["serverId"].toString(),
+    nickname: json["roleName"],
   );
 
   Map<String, dynamic> toJson() => {

@@ -29,8 +29,10 @@ class _SecondPage extends State<SecondPage> {
     "18043172036":"流魂街52区","1010473892":"流魂街103区","1011550377":"流魂街51区"};
 
   String _printText = "开始领取积分";
+  Dio dio;
+  var blAccounts = [];
 
-  void _blLoginAction() async
+  void _blGetPointAction() async
   {
     Map<String, dynamic> headers = new Map();
     headers["token"] = BLApi.BL_WX_TOKEN;
@@ -41,9 +43,26 @@ class _SecondPage extends State<SecondPage> {
 
     _printText = "开始领取积分";
 
-    Dio dio = new Dio(options);
+    this.dio = new Dio(options);
+    preparedBLUser();
+    for (Map<String, dynamic> params in this.blAccounts) {
+      ///登陆账号
+      Response responseLogin = await this.dio.post(BLApi.BL_USER_LOGIN, data: params);
+      int code = BLResponse.fromJson(responseLogin.data).code;
+      blPrintTextView("账号登陆状态:" + code.toString());
+      ///登陆成功
+      if (code == 0) {
+        await doUserGetPoint(this.dio, params["account"]);
+      }
 
-    List<Map<String, dynamic>> accounts = new List();
+      Response responseLogout = await this.dio.post(BLApi.BL_USER_LOGOUT);
+      code = BLResponse.fromJson(responseLogout.data).code;
+      blPrintTextView("账号登出状态:" + code.toString());
+    }
+  }
+
+  void preparedBLUser() {
+    var accounts = [];
     Map<String, dynamic> params = new Map();
     params["loginType"] = 0;
     params["account"] = '1011550377';
@@ -64,20 +83,7 @@ class _SecondPage extends State<SecondPage> {
     params["account"] = '1010473892';
     params["passWord"] = 'liuyixian11';
     accounts.add(params);
-    for (Map<String, dynamic> params in accounts) {
-      ///登陆账号
-      Response responseLogin = await dio.post(BLApi.BL_USER_LOGIN, data: params);
-      int code = BLResponse.fromJson(responseLogin.data).code;
-      blPrintTextView("账号登陆状态:" + code.toString());
-      ///登陆成功
-      if (code == 0) {
-        await doUserGetPoint(dio, params["account"]);
-      }
-
-      Response responseLogout = await dio.post(BLApi.BL_USER_LOGOUT);
-      code = BLResponse.fromJson(responseLogout.data).code;
-      blPrintTextView("账号登出状态:" + code.toString());
-    }
+    this.blAccounts = accounts;
   }
 
   void blPrintTextView(String line) {
@@ -123,6 +129,79 @@ class _SecondPage extends State<SecondPage> {
     }
   }
 
+  void _blCircleAction() async {
+    Map<String, dynamic> headers = new Map();
+    BaseOptions options = new BaseOptions(
+      baseUrl:BLApi.BLZP_BASE_URL,
+    );
+
+    _printText = "开始转盘";
+
+    this.dio = new Dio(options);
+    preparedBLUser();
+    for (Map<String, dynamic> params in this.blAccounts) {
+      params["openId"] = BLApi.BLZP_WX_OPEN_ID;
+      ///登陆账号
+      Response responseLogin = await this.dio.post(BLApi.BLZP_USER_LOGIN, data: params);
+      int code = BLResponse.fromJson(responseLogin.data).code;
+      blPrintTextView("账号登陆状态:" + code.toString());
+      ///登陆成功
+      if (code == 0) {
+        await doUserGetZPPoint(this.dio, params["account"]);
+      }
+
+      Response responseLogout = await this.dio.post(BLApi.BLZP_USER_LOGOUT, data: BLApi.BLZP_WX_OPEN_ID);
+      blPrintTextView("账号登出状态:" + responseLogout.toString());
+    }
+  }
+
+  Future doUserGetZPPoint (Dio dio, String account) async
+  {
+    ///获取绑定列表
+    Response responseServer = await dio.get(BLApi.BLZP_SERVER_LIST, queryParameters:{"openId":BLApi.BLZP_WX_OPEN_ID});
+    var serverList = BlServerInfoResp.fromZPJson(responseServer.data);
+
+    var list = serverList.serverList;
+
+    for (BLServerInfo serverInfo in list) {
+      ///匹配正确的账号信息
+      if (serverInfo.name == serverKeyValues[account]) {
+        Map<String, dynamic> params = new Map();
+        params["phone"] = "18888888888";
+        params["serverId"] = serverInfo.serverId;
+        params["openId"] = BLApi.BLZP_WX_OPEN_ID;
+
+        ///绑定账号内容
+        Response responseBind = await dio.post(
+            BLApi.BLZP_USER_BIND_ROLE, data: params);
+
+        blPrintTextView("当前绑定的游戏昵称:" + serverInfo.nickname + " 绑定结果:" +
+            BLResponse
+                .fromJson(responseBind.data)
+                .code
+                .toString());
+
+        ///开始获取积分
+        await getAllPointThanPlayByUser(dio, serverInfo.nickname);
+      }
+    }
+  }
+
+  Future getAllPointThanPlayByUser(dio, String nickname) async
+  {
+    ///按照类型开始领取积分
+    for (int i = 1; i < 4; i++)
+    {
+      Response responsePoint = await dio.post(BLApi.BLZP_GET_CHAGNE, data: {"type":i,"openId":BLApi.BLZP_WX_OPEN_ID});
+      BLResponse response = BLResponse.fromJson(responsePoint.data);
+      blPrintTextView(nickname + " 获取转盘机会 类型:" + i.toString() + " 结果:" + response.code.toString() + " 消息:" + response.msg);
+
+      Response responseUseChange = await dio.post(BLApi.BLZP_USE_CHNAGE, data:BLApi.BLZP_WX_OPEN_ID);
+      BLUseChanceResp resp = BLUseChanceResp.fromJson(responseUseChange.data);
+      blPrintTextView(nickname + " 摇转盘结果:" + resp.code.toString() + " 消息:" + resp.msg + " 奖励:" + resp.itemName);
+    }
+  }
+
   ///获取积分
   Future getAllPointByUser (Dio dio, String nickname) async
   {
@@ -148,10 +227,38 @@ class _SecondPage extends State<SecondPage> {
         "白哉娃娃:" + info.dollbz.toString() + "]");
   }
 
-  TextButton normalFlatButton(){
+  TextButton getPointTextButton(){
     return TextButton(
-      onPressed: _blLoginAction,
+      onPressed: _blGetPointAction,
       child: Text("自动领取积分"),
+      style: ButtonStyle(
+        ///更优美的方式来设置
+        foregroundColor: MaterialStateProperty.resolveWith((states) {
+          if (states.contains(MaterialState.pressed)) {
+            //按下时的颜色
+            return Colors.red;
+          }
+          //默认状态使用灰色
+          return Colors.white;
+        },
+        ),
+        ///背景颜色
+        backgroundColor: MaterialStateProperty.resolveWith((states) {
+          //设置按下时的背景颜色
+          if (states.contains(MaterialState.pressed)) {
+            return Colors.purple[200];
+          }
+          //默认不使用背景颜色
+          return Colors.blue;
+        }),
+      ),
+    );
+  }
+
+  TextButton circleTextButton () {
+    return TextButton(
+      onPressed: _blCircleAction,
+      child: Text("自动转盘处理"),
       style: ButtonStyle(
         ///更优美的方式来设置
         foregroundColor: MaterialStateProperty.resolveWith((states) {
@@ -180,7 +287,8 @@ class _SecondPage extends State<SecondPage> {
     return ListView(
         padding: EdgeInsets.all(20),
         children: [
-          normalFlatButton(),
+          getPointTextButton(),
+          circleTextButton(),
           Text(_printText, style: TextStyle(color: Colors.black54),),
         ]
     );

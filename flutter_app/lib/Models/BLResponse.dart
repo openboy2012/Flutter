@@ -27,3 +27,29 @@ class BLResponse {
     "code": code,
   };
 }
+
+class BLUseChanceResp {
+  BLUseChanceResp ({
+    this.msg,
+    this.code,
+    this.drawResult,
+    this.itemName,
+  });
+
+  String msg;
+  int code;
+  int drawResult;
+  String itemName;
+
+  factory BLUseChanceResp.fromJson(Map<String, dynamic> json) => BLUseChanceResp(
+    msg: json["msg"],
+    code: json["code"],
+    drawResult: json["drawResult"] == null ? null : json["drawResult"],
+    itemName: json["itemName"] == null ? "无" : json["itemName"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "msg": msg,
+    "code": code,
+  };
+}
