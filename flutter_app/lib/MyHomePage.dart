@@ -22,25 +22,63 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
 
-  FlatButton getPointFlatButton(){
-    return FlatButton(
+  TextButton getPointFlatButton(){
+    return TextButton(
       onPressed: (){
         Navigator.push(context, MaterialPageRoute(builder: (context) => SecondPage()));
       },
       child: Text("死神激斗积分领取"),
-      color: Colors.blue,
-      textColor: Colors.white,
+      style: ButtonStyle(
+        ///更优美的方式来设置
+        foregroundColor: MaterialStateProperty.resolveWith((states) {
+          if (states.contains(MaterialState.pressed)) {
+            //按下时的颜色
+            return Colors.red;
+          }
+          //默认状态使用灰色
+          return Colors.white;
+        },
+        ),
+        ///背景颜色
+        backgroundColor: MaterialStateProperty.resolveWith((states) {
+          //设置按下时的背景颜色
+          if (states.contains(MaterialState.pressed)) {
+            return Colors.purple[200];
+          }
+          //默认不使用背景颜色
+          return Colors.blue;
+        }),
+      ),
     );
   }
 
-  FlatButton playerFlatButton(){
-    return FlatButton(
+  TextButton playerFlatButton(){
+    return TextButton(
       onPressed: (){
         Navigator.push(context, MaterialPageRoute(builder: (context) => BLGetDollPage()));
       },
       child: Text("死神激斗刷分"),
-      color: Colors.blue,
-      textColor: Colors.white,
+      style: ButtonStyle(
+        ///更优美的方式来设置
+        foregroundColor: MaterialStateProperty.resolveWith((states) {
+          if (states.contains(MaterialState.pressed)) {
+            //按下时的颜色
+            return Colors.red;
+          }
+          //默认状态使用灰色
+          return Colors.white;
+        },
+        ),
+        ///背景颜色
+        backgroundColor: MaterialStateProperty.resolveWith((states) {
+          //设置按下时的背景颜色
+          if (states.contains(MaterialState.pressed)) {
+            return Colors.purple[200];
+          }
+          //默认不使用背景颜色
+          return Colors.blue;
+        }),
+      ),
     );
   }
 

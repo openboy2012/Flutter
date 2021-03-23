@@ -244,21 +244,59 @@ class _BLGetDollPage extends State<BLGetDollPage> {
     while (info.point > 0 && needContinue);
   }
 
-  FlatButton loginFlatButton(){
-    return FlatButton(
+  TextButton loginFlatButton(){
+    return TextButton(
       onPressed: blLoginAction,
       child: Text("登陆账号"),
-      color: Colors.blue,
-      textColor: Colors.white,
+      style: ButtonStyle(
+        ///更优美的方式来设置
+        foregroundColor: MaterialStateProperty.resolveWith((states) {
+          if (states.contains(MaterialState.pressed)) {
+            //按下时的颜色
+            return Colors.red;
+          }
+          //默认状态使用灰色
+          return Colors.white;
+        },
+        ),
+        ///背景颜色
+        backgroundColor: MaterialStateProperty.resolveWith((states) {
+          //设置按下时的背景颜色
+          if (states.contains(MaterialState.pressed)) {
+            return Colors.purple[200];
+          }
+          //默认不使用背景颜色
+          return Colors.blue;
+        }),
+      ),
     );
   }
 
-  FlatButton getDollFlatButton(){
-    return FlatButton(
+  TextButton getDollFlatButton(){
+    return TextButton(
       onPressed: getDollAction,
       child: Text("开始刷新娃娃"),
-      color: Colors.blue,
-      textColor: Colors.white,
+      style: ButtonStyle(
+        ///更优美的方式来设置
+        foregroundColor: MaterialStateProperty.resolveWith((states) {
+          if (states.contains(MaterialState.pressed)) {
+            //按下时的颜色
+            return Colors.red;
+          }
+          //默认状态使用灰色
+          return Colors.white;
+        },
+        ),
+        ///背景颜色
+        backgroundColor: MaterialStateProperty.resolveWith((states) {
+          //设置按下时的背景颜色
+          if (states.contains(MaterialState.pressed)) {
+            return Colors.purple[200];
+          }
+          //默认不使用背景颜色
+          return Colors.blue;
+        }),
+      ),
     );
   }
 
