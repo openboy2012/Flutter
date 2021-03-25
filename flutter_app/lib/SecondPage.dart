@@ -4,6 +4,7 @@ import 'package:flutter_app/APIs/BLApi.dart';
 import 'package:flutter_app/Models/BLResponse.dart';
 import 'package:flutter_app/Models/BLServerInfo.dart';
 import 'package:flutter_app/Models/BLItemInfo.dart';
+import 'dart:io';
 
 class SecondPage extends StatefulWidget {
   SecondPage({Key key, this.title}) : super(key: key);
@@ -195,10 +196,14 @@ class _SecondPage extends State<SecondPage> {
       Response responsePoint = await dio.post(BLApi.BLZP_GET_CHAGNE, data: {"type":i,"openId":BLApi.BLZP_WX_OPEN_ID});
       BLResponse response = BLResponse.fromJson(responsePoint.data);
       blPrintTextView(nickname + " 获取转盘机会 类型:" + i.toString() + " 结果:" + response.code.toString() + " 消息:" + response.msg);
+    }
 
+    for (int j = 0; j< 3; j++)
+    {
       Response responseUseChange = await dio.post(BLApi.BLZP_USE_CHNAGE, data:BLApi.BLZP_WX_OPEN_ID);
       BLUseChanceResp resp = BLUseChanceResp.fromJson(responseUseChange.data);
       blPrintTextView(nickname + " 摇转盘结果:" + resp.code.toString() + " 消息:" + resp.msg + " 奖励:" + resp.itemName);
+      sleep(Duration(seconds: 2));
     }
   }
 
