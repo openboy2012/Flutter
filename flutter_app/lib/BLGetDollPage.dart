@@ -160,8 +160,7 @@ class _BLGetDollPage extends State<BLGetDollPage> {
           ///蓝染
           if (dollType == 3) {
             ///没有刷到娃娃，但是成功，需要退出循环
-            if (blItemInfoResp.itemInfo.dolllr != lastInfo.dolllr + 1)
-            {
+            if (blItemInfoResp.itemInfo.dolllr != lastInfo.dolllr + 1) {
               lastInfo = blItemInfoResp.itemInfo;
               needContinue = false;
               blPrintTextView("刷到环，任务强制结束 [积分:" + lastInfo.point.toString() +
@@ -175,8 +174,7 @@ class _BLGetDollPage extends State<BLGetDollPage> {
                   " 蓝染娃娃数量:" + lastInfo.dolllr.toString() +
                   " 白哉娃娃数量:" + lastInfo.dollbz.toString() + "]"
               );
-              if (lastInfo.point == 0)
-              {
+              if (lastInfo.point == 0) {
                 needContinue = false;
               }
               if (lastInfo.dolllr < 3 * _crystalNumber) {
@@ -201,8 +199,7 @@ class _BLGetDollPage extends State<BLGetDollPage> {
           ///白哉
           else {
             ///没有刷到娃娃，但是成功，需要退出循环
-            if (blItemInfoResp.itemInfo.dollbz != lastInfo.dollbz + 1)
-            {
+            if (blItemInfoResp.itemInfo.dollbz != lastInfo.dollbz + 1) {
               lastInfo = blItemInfoResp.itemInfo;
               needContinue = false;
               blPrintTextView("刷到环，任务强制结束 [积分:" + lastInfo.point.toString() +
@@ -212,14 +209,13 @@ class _BLGetDollPage extends State<BLGetDollPage> {
             }
             else {
               lastInfo = blItemInfoResp.itemInfo;
-              if (lastInfo.point == 0)
-              {
-                needContinue = false;
-              }
               blPrintTextView("刷到一个白哉 [积分:" + lastInfo.point.toString() +
                   " 蓝染娃娃数量:" + lastInfo.dolllr.toString() +
                   " 白哉娃娃数量:" + lastInfo.dollbz.toString() + "]"
               );
+              if (lastInfo.point == 0) {
+                needContinue = false;
+              }
               if (lastInfo.dollbz < 4 * _crystalNumber) {
                 ///被4整数以后转换下类型
                 if (lastInfo.dollbz % 4 == 0) {
