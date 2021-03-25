@@ -177,7 +177,7 @@ class _BLGetDollPage extends State<BLGetDollPage> {
               if (lastInfo.point == 0) {
                 needContinue = false;
               }
-              if (lastInfo.dolllr < 3 * _crystalNumber) {
+              if (lastInfo.dolllr <= 3 * _crystalNumber) {
                 ///被3整数以后转换下类型
                 if (lastInfo.dolllr % 3 == 0) {
                   blPrintTextView("转换抽取类型为白哉娃娃");
@@ -188,11 +188,16 @@ class _BLGetDollPage extends State<BLGetDollPage> {
                 }
               }
               else {
-                needContinue = false;
-                blPrintTextView("完成刷分任务[积分:" + lastInfo.point.toString() +
-                    " 蓝染娃娃数量:" + lastInfo.dolllr.toString() +
-                    " 白哉娃娃数量:" + lastInfo.dollbz.toString() + "]"
-                );
+                if (lastInfo.dollbz >= 4 * _crystalNumber) {
+                  needContinue = false;
+                  blPrintTextView("完成刷分任务[积分:" + lastInfo.point.toString() +
+                      " 蓝染娃娃数量:" + lastInfo.dolllr.toString() +
+                      " 白哉娃娃数量:" + lastInfo.dollbz.toString() + "]"
+                  );
+                }
+                else {
+                    dollType = 2;
+                }
               }
             }
           }
@@ -216,7 +221,7 @@ class _BLGetDollPage extends State<BLGetDollPage> {
               if (lastInfo.point == 0) {
                 needContinue = false;
               }
-              if (lastInfo.dollbz < 4 * _crystalNumber) {
+              if (lastInfo.dollbz <= 4 * _crystalNumber) {
                 ///被4整数以后转换下类型
                 if (lastInfo.dollbz % 4 == 0) {
                   blPrintTextView("转换抽取类型为蓝染娃娃");
