@@ -13,16 +13,17 @@ class BLApi {
   static const String BL_SERVER_LIST = "/player/getServerList";
   ///获取游戏角色的积分内容
   static const String BL_GET_POINT = "/playerItem/getPoint";
-  ///刷娃娃
+  ///获取娃娃接口
   static const String BL_GET_DOLL = "/playerItem/getGashapon";
-  ///获取娃娃数据
+  ///获取已经获得的娃娃数据接口
   static const String BL_USER_DOLL_INFO = "/playerItem/getItemInfo";
+  ///兑换娃娃接口
+  static const String BL_GET_CRYSTAL = "/playerItem/exchangeItem";
 
   ///转盘
   static const String BLZP_BASE_URL = "https://h5-bl2-https.mobage.cn/bl2dailydraw/";
-
+  ///微信openId
   static const String BLZP_WX_OPEN_ID = "oDRfo0ZtRcduE4TUI55x6PFE_QOQ";
-
   ///登陆API
   static const String BLZP_USER_LOGIN = "/sys/login";
   ///账号下的角色列表
@@ -33,6 +34,6 @@ class BLApi {
   static const String BLZP_USER_LOGOUT = "/sys/logout";
   ///获取游戏角色的积分内容
   static const String BLZP_GET_CHAGNE = "/draw/getChance";
-  ///刷娃娃
+  ///转盘使用
   static const String BLZP_USE_CHNAGE = "/draw/dailyDraw";
 }

@@ -248,10 +248,67 @@ class _BLGetDollPage extends State<BLGetDollPage> {
     while (needContinue);
   }
 
+  void exchangeCrystalAction () async
+  {
+    var blItemInfoResp = this.loginResp;
+    BLItemInfo lastInfo = blItemInfoResp.itemInfo;
+    if (_crystalNumber == 0)
+    {
+      blPrintTextView("请输入数量");
+      return;
+    }
+
+    for (int i = 0; i < _crystalNumber; i++)
+    {
+      Response responseGetCrystal = await this.dio.post(BLApi.BL_GET_CRYSTAL, data:{"type":3});
+      blItemInfoResp = BLItemInfoResp.fromGetDollJson(responseGetCrystal.data);
+      if (blItemInfoResp.code == 0)
+      {
+        BLItemInfo lastInfo = blItemInfoResp.itemInfo;
+        blPrintTextView("兑换一个水晶成功，[积分:" + lastInfo.point.toString() +
+            " 蓝染娃娃数量:" + lastInfo.dolllr.toString() +
+            " 白哉娃娃数量:" + lastInfo.dollbz.toString() + "]"
+        );
+      }
+      else {
+        blPrintTextView("兑换一个水晶失败，消息:" + blItemInfoResp.msg);
+        break;
+      }
+    }
+  }
+
   TextButton loginFlatButton(){
     return TextButton(
       onPressed: blLoginAction,
       child: Text("登陆账号"),
+      style: ButtonStyle(
+        ///更优美的方式来设置
+        foregroundColor: MaterialStateProperty.resolveWith((states) {
+          if (states.contains(MaterialState.pressed)) {
+            //按下时的颜色
+            return Colors.red;
+          }
+          //默认状态使用灰色
+          return Colors.white;
+        },
+        ),
+        ///背景颜色
+        backgroundColor: MaterialStateProperty.resolveWith((states) {
+          //设置按下时的背景颜色
+          if (states.contains(MaterialState.pressed)) {
+            return Colors.purple[200];
+          }
+          //默认不使用背景颜色
+          return Colors.blue;
+        }),
+      ),
+    );
+  }
+
+  TextButton getCrystalFlatButton(){
+    return TextButton(
+      onPressed: exchangeCrystalAction,
+      child: Text("兑换水晶"),
       style: ButtonStyle(
         ///更优美的方式来设置
         foregroundColor: MaterialStateProperty.resolveWith((states) {
@@ -344,6 +401,7 @@ class _BLGetDollPage extends State<BLGetDollPage> {
           decoration:
           InputDecoration(labelText: '水晶数量'),),
         getDollFlatButton(),
+        getCrystalFlatButton(),
         Text(_printText, style: TextStyle(color: Colors.black54),),
       ],
     );

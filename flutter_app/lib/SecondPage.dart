@@ -198,12 +198,13 @@ class _SecondPage extends State<SecondPage> {
       blPrintTextView(nickname + " 获取转盘机会 类型:" + i.toString() + " 结果:" + response.code.toString() + " 消息:" + response.msg);
     }
 
-    for (int j = 0; j< 3; j++)
+    for (int j = 0; j < 3; j++)
     {
-      Response responseUseChange = await dio.post(BLApi.BLZP_USE_CHNAGE, data:BLApi.BLZP_WX_OPEN_ID);
-      BLUseChanceResp resp = BLUseChanceResp.fromJson(responseUseChange.data);
-      blPrintTextView(nickname + " 摇转盘结果:" + resp.code.toString() + " 消息:" + resp.msg + " 奖励:" + resp.itemName);
-      sleep(Duration(seconds: 2));
+      await Future.delayed(Duration(milliseconds: 500 * j), () async{
+        Response responseUseChange = await this.dio.post(BLApi.BLZP_USE_CHNAGE, data:BLApi.BLZP_WX_OPEN_ID);
+        BLUseChanceResp resp = BLUseChanceResp.fromJson(responseUseChange.data);
+        blPrintTextView(nickname + " 摇转盘结果:" + resp.code.toString() + " 消息:" + resp.msg + " 奖励:" + resp.itemName);
+      });
     }
   }
 
