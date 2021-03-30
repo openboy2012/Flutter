@@ -34,18 +34,29 @@ class BLUseChanceResp {
     this.code,
     this.drawResult,
     this.itemName,
+    this.canDrawCount,
+    this.useDrawCount,
   });
 
   String msg;
   int code;
   int drawResult;
   String itemName;
+  int canDrawCount;
+  int useDrawCount;
 
   factory BLUseChanceResp.fromJson(Map<String, dynamic> json) => BLUseChanceResp(
     msg: json["msg"],
     code: json["code"],
     drawResult: json["drawResult"] == null ? null : json["drawResult"],
     itemName: json["itemName"] == null ? "无" : json["itemName"],
+  );
+
+  factory BLUseChanceResp.fromBaseJson(Map<String, dynamic> json) => BLUseChanceResp(
+    msg: json["msg"],
+    code: json["code"],
+    useDrawCount: json["useDrawCount"],
+    canDrawCount: json["canDrawCount"],
   );
 
   Map<String, dynamic> toJson() => {

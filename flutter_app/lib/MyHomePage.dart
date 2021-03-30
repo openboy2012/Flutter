@@ -90,7 +90,7 @@ class _MyHomePageState extends State<MyHomePage> {
         Padding(
           padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
           child: Container(
-            height: 40,
+            height: 20,
           ),
         ),
         playerFlatButton(),

@@ -30,10 +30,13 @@ class BLApi {
   static const String BLZP_SERVER_LIST = "/binding/getSystem";
   ///绑定角色关系
   static const String BLZP_USER_BIND_ROLE = "/binding/bindingRegion";
+  ///获取用户信息
+  static const String BLZP_USER_BASEINFO = "/binding/getBaseInfo";
   ///登陆账号
   static const String BLZP_USER_LOGOUT = "/sys/logout";
   ///获取游戏角色的积分内容
   static const String BLZP_GET_CHAGNE = "/draw/getChance";
   ///转盘使用
   static const String BLZP_USE_CHNAGE = "/draw/dailyDraw";
+
 }
