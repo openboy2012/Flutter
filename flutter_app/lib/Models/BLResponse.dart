@@ -10,32 +10,32 @@ String blResponseToJson(BLResponse data) => json.encode(data.toJson());
 
 class BLResponse {
   BLResponse({
-    this.msg,
-    this.code,
+    required this.msg,
+    required this.code,
   });
 
   String msg;
   int code;
 
   factory BLResponse.fromJson(Map<String, dynamic> json) => BLResponse(
-    msg: json["msg"],
-    code: json["code"],
-  );
+        msg: json["msg"],
+        code: json["code"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "msg": msg,
-    "code": code,
-  };
+        "msg": msg,
+        "code": code,
+      };
 }
 
 class BLUseChanceResp {
-  BLUseChanceResp ({
-    this.msg,
-    this.code,
-    this.drawResult,
-    this.itemName,
-    this.canDrawCount,
-    this.useDrawCount,
+  BLUseChanceResp({
+    required this.msg,
+    required this.code,
+    required this.drawResult,
+    required this.itemName,
+    required this.canDrawCount,
+    required this.useDrawCount,
   });
 
   String msg;
@@ -45,22 +45,28 @@ class BLUseChanceResp {
   int canDrawCount;
   int useDrawCount;
 
-  factory BLUseChanceResp.fromJson(Map<String, dynamic> json) => BLUseChanceResp(
-    msg: json["msg"],
-    code: json["code"],
-    drawResult: json["drawResult"] == null ? null : json["drawResult"],
-    itemName: json["itemName"] == null ? "无" : json["itemName"],
-  );
+  factory BLUseChanceResp.fromJson(Map<String, dynamic> json) =>
+      BLUseChanceResp(
+        msg: json["msg"],
+        code: json["code"],
+        drawResult: json["drawResult"] == null ? null : json["drawResult"],
+        itemName: json["itemName"] == null ? "无" : json["itemName"],
+        canDrawCount: 0,
+        useDrawCount: 0,
+      );
 
-  factory BLUseChanceResp.fromBaseJson(Map<String, dynamic> json) => BLUseChanceResp(
-    msg: json["msg"],
-    code: json["code"],
-    useDrawCount: json["useDrawCount"],
-    canDrawCount: json["canDrawCount"],
-  );
+  factory BLUseChanceResp.fromBaseJson(Map<String, dynamic> json) =>
+      BLUseChanceResp(
+        msg: json["msg"],
+        code: json["code"],
+        drawResult: 0,
+        itemName: "",
+        useDrawCount: json["useDrawCount"],
+        canDrawCount: json["canDrawCount"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "msg": msg,
-    "code": code,
-  };
+        "msg": msg,
+        "code": code,
+      };
 }

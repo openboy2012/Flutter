@@ -10,52 +10,59 @@ String blItemInfoToJson(BLItemInfo data) => json.encode(data.toJson());
 
 class BLItemInfoResp {
   BLItemInfoResp({
-    this.msg,
-    this.code,
-    this.itemInfo,
+    required this.msg,
+    required this.code,
+    required this.itemInfo,
   });
 
   String msg;
   int code;
   BLItemInfo itemInfo;
 
-  factory BLItemInfoResp.fromGetItemJson(Map<String, dynamic> json) => BLItemInfoResp(
-    msg: json["msg"],
-    code: json["code"],
-    itemInfo: BLItemInfo.fromJson(json["itemInfo"]),
-  );
+  factory BLItemInfoResp.fromGetItemJson(Map<String, dynamic> json) =>
+      BLItemInfoResp(
+        msg: json["msg"],
+        code: json["code"],
+        itemInfo: BLItemInfo.fromJson(json["itemInfo"]),
+      );
 
-  factory BLItemInfoResp.fromGetDollJson(Map<String, dynamic> json) => BLItemInfoResp(
-    msg: json["msg"],
-    code: json["code"],
-    itemInfo: json["newItemInfo"] == null ? null : BLItemInfo.fromJson(json["newItemInfo"]),
-  );
+  factory BLItemInfoResp.fromGetDollJson(Map<String, dynamic> json) =>
+      BLItemInfoResp(
+        msg: json["msg"],
+        code: json["code"],
+        itemInfo: BLItemInfo.fromJson(json["newItemInfo"]),
+      );
 
   Map<String, dynamic> toJson() => {
-    "msg": msg,
-    "code": code,
-  };
+        "msg": msg,
+        "code": code,
+      };
 }
 
 class BLItemInfo {
   BLItemInfo({
-    this.dollbz,
-    this.dolllr,
-    this.point,
+    required this.dollbz,
+    required this.dolllr,
+    required this.point,
   });
 
-  int dollbz; ///朽木白哉的娃娃数量
-  int dolllr; ///蓝染惣右介的娃娃数量
-  int point; ///剩余保存的积分
+  ///朽木白哉的娃娃数量
+  int dollbz;
+
+  ///蓝染惣右介的娃娃数量
+  int dolllr;
+
+  ///剩余保存的积分
+  int point;
 
   factory BLItemInfo.fromJson(Map<String, dynamic> json) => BLItemInfo(
-    dollbz: json["doll3"],
-    dolllr: json["doll4"],
-    point: json["point"],
-  );
+        dollbz: json["doll3"],
+        dolllr: json["doll4"],
+        point: json["point"],
+      );
 
   Map<String, dynamic> toJson() => {
-    // "msg": msg,
-    // "code": code,
-  };
+        // "msg": msg,
+        // "code": code,
+      };
 }
