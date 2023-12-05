@@ -1,9 +1,10 @@
+// ignore_for_file: invalid_use_of_visible_for_testing_member
+
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_app/Models/Product.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:flutter_app/ProductListPage.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:qrscan/qrscan.dart' as scanner;
 
@@ -25,136 +26,183 @@ class ProductInputPage extends StatefulWidget {
 
 class _ProductInputPage extends State<ProductInputPage> {
   Uint8List bytes = Uint8List(0);
+  late TextEditingController _inputController;
+  late TextEditingController _outputController;
   late Product product;
-  late TextField scanNoTF;
-  late TextField nameTF;
-  late TextField priceTF;
+
+  @override
+  void initState() {
+    super.initState();
+    this._inputController = new TextEditingController();
+    this._outputController = new TextEditingController();
+  }
 
   void scanChanged(String text) {
     product.scanNo = text;
   }
 
-  TextField _scanNoTF() {
+  void nameChanged(String text) {
+    product.name = text;
+  }
+
+  void priceChanged(String text) {
+    product.price = text as int;
+  }
+
+  TextField scanNoTF() {
     return TextField(
+      controller: this._outputController,
       onChanged: scanChanged,
-      decoration: InputDecoration(labelText: '账户名'),
+      onSubmitted: (value) => _generateBarCode(value),
+      decoration: InputDecoration(
+        prefixIcon: Icon(Icons.text_fields),
+        helperText: '商品条形码，可以输入或者扫描商品',
+        hintText: '请输入条形码',
+        hintStyle: TextStyle(fontSize: 15),
+        contentPadding: EdgeInsets.symmetric(horizontal: 7, vertical: 15),
+        suffixIcon: GestureDetector(
+            onTap: () => _scan(), child: Icon(Icons.info_outline_rounded)),
+      ),
+    );
+  }
+
+  TextField nameTF() {
+    return TextField(
+      onChanged: nameChanged,
+      decoration:
+          InputDecoration(prefixIcon: Icon(Icons.abc), labelText: '商品名称'),
+    );
+  }
+
+  TextField priceTF() {
+    return TextField(
+      onChanged: priceChanged,
+      decoration: InputDecoration(
+          prefixIcon: Icon(Icons.price_change), labelText: '商品价格'),
     );
   }
 
   ListView _listV() {
     return ListView(
       padding: EdgeInsets.all(20),
-      children: [scanNoTF, nameTF, priceTF],
+      children: [
+        scanNoTF(),
+        SizedBox(height: 20),
+        nameTF(),
+        SizedBox(height: 20),
+        priceTF(),
+      ],
     );
   }
 
-  Widget _qrCodeWidget(Uint8List bytes, BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.all(20),
-      child: Card(
-        elevation: 6,
-        child: Column(
-          children: <Widget>[
-            Container(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: <Widget>[
-                  Icon(Icons.verified_user, size: 18, color: Colors.green),
-                  Text('  Generate Qrcode', style: TextStyle(fontSize: 15)),
-                  Spacer(),
-                  Icon(Icons.more_vert, size: 18, color: Colors.black54),
-                ],
-              ),
-              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 9),
-              decoration: BoxDecoration(
-                color: Colors.black12,
-                borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(4), topRight: Radius.circular(4)),
-              ),
-            ),
-            Padding(
-              padding:
-                  EdgeInsets.only(left: 40, right: 40, top: 30, bottom: 10),
-              child: Column(
-                children: <Widget>[
-                  SizedBox(
-                    height: 190,
-                    child: bytes.isEmpty
-                        ? Center(
-                            child: Text('Empty code ... ',
-                                style: TextStyle(color: Colors.black38)),
-                          )
-                        : Image.memory(bytes),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(top: 7, left: 25, right: 25),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: <Widget>[
-                        Expanded(
-                          flex: 5,
-                          child: GestureDetector(
-                            child: Text(
-                              'remove',
-                              style:
-                                  TextStyle(fontSize: 15, color: Colors.blue),
-                              textAlign: TextAlign.left,
-                            ),
-                            onTap: () =>
-                                this.setState(() => this.bytes = Uint8List(0)),
-                          ),
-                        ),
-                        Text('|',
-                            style:
-                                TextStyle(fontSize: 15, color: Colors.black26)),
-                        Expanded(
-                          flex: 5,
-                          child: GestureDetector(
-                            onTap: () async {
-                              final success =
-                                  await ImageGallerySaver.saveImage(this.bytes);
-                              SnackBar snackBar;
-                              if (success) {
-                                snackBar = new SnackBar(
-                                    content:
-                                        new Text('Successful Preservation!'));
-                                // Scaffold.of(context).showSnackBar(snackBar);
-                              } else {
-                                snackBar = new SnackBar(
-                                    content: new Text('Save failed!'));
-                              }
-                            },
-                            child: Text(
-                              'save',
-                              style:
-                                  TextStyle(fontSize: 15, color: Colors.blue),
-                              textAlign: TextAlign.right,
-                            ),
-                          ),
-                        ),
-                      ],
+  Widget _buttonGroup() {
+    return Row(
+      children: <Widget>[
+        Expanded(
+          flex: 1,
+          child: SizedBox(
+            height: 120,
+            child: InkWell(
+              onTap: () => _generateBarCode(this._inputController.text),
+              child: Card(
+                child: Column(
+                  children: <Widget>[
+                    Expanded(
+                      flex: 2,
+                      child: Image.asset('images/generate_qrcode.png'),
                     ),
-                  )
-                ],
+                    Divider(height: 20),
+                    Expanded(flex: 1, child: Text("Generate")),
+                  ],
+                ),
               ),
             ),
-            Divider(height: 2, color: Colors.black26),
-            Container(
-              child: Row(
-                children: <Widget>[
-                  Icon(Icons.history, size: 16, color: Colors.black38),
-                  Text('  Generate History',
-                      style: TextStyle(fontSize: 14, color: Colors.black38)),
-                  Spacer(),
-                  Icon(Icons.chevron_right, size: 16, color: Colors.black38),
-                ],
-              ),
-              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 9),
-            )
-          ],
+          ),
         ),
-      ),
+        Expanded(
+          flex: 1,
+          child: SizedBox(
+            height: 120,
+            child: InkWell(
+              onTap: _scan,
+              child: Card(
+                child: Column(
+                  children: <Widget>[
+                    Expanded(
+                      flex: 2,
+                      child: Image.asset('images/scanner.png'),
+                    ),
+                    Divider(height: 20),
+                    Expanded(flex: 1, child: Text("Scan")),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+        Expanded(
+          flex: 1,
+          child: SizedBox(
+            height: 120,
+            child: InkWell(
+              onTap: _scanPhoto,
+              child: Card(
+                child: Column(
+                  children: <Widget>[
+                    Expanded(
+                      flex: 2,
+                      child: Image.asset('images/albums.png'),
+                    ),
+                    Divider(height: 20),
+                    Expanded(flex: 1, child: Text("Scan Photo")),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
+  }
+
+  Future _scan() async {
+    await Permission.camera.request();
+    String? barcode = await scanner.scan();
+    if (barcode == null) {
+      print('nothing return.');
+    } else {
+      this._outputController.text = barcode;
+    }
+  }
+
+  Future _scanPhoto() async {
+    await Permission.storage.request();
+    String barcode = await scanner.scanPhoto();
+    this._outputController.text = barcode;
+  }
+
+  // Future _scanPath(String path) async {
+  //   await Permission.storage.request();
+  //   String barcode = await scanner.scanPath(path);
+  //   this._outputController.text = barcode;
+  // }
+
+  // Future _scanBytes() async {
+  //   File? file = await ImagePicker.platform
+  //       .getImageFromSource(source: ImageSource.camera)
+  //       .then((picked) {
+  //     if (picked == null) return null;
+  //     return File(picked.path);
+  //   });
+  //   if (file == null) return;
+  //   Uint8List bytes = file.readAsBytesSync();
+  //   String barcode = await scanner.scanBytes(bytes);
+  //   this._outputController.text = barcode;
+  // }
+
+  Future _generateBarCode(String inputCode) async {
+    Uint8List result = await scanner.generateBarCode(inputCode);
+    this.setState(() => this.bytes = result);
   }
 
   @override
@@ -168,7 +216,9 @@ class _ProductInputPage extends State<ProductInputPage> {
             IconButton(
               icon: const Icon(Icons.save),
               tooltip: 'Show Snackbar',
-              onPressed: () async {},
+              onPressed: () async {
+                realm.writeAsync(() => null);
+              },
             )
           ],
         ),
